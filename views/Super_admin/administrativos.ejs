@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador</title>
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+
+        <!-- Navbar -->
+        <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-center"><br><br>
+                        <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                        <span class="mx-2">/</span>
+                        <a href="/sp_admin/Administrativos" class="breadcrumb-link">Administrativos</a>
+                        <span class="mx-2">/</span>
+                        <span class="breadcrumb-current">Consulta Administrativa</span>
+                    </div>
+
+                    <!-- Tarjeta flotante con tabla -->
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title">Lista de Administrativos</h5>
+                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#addModal">Agregar
+                                    Administrador</button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="personTable">
+                                    <thead>
+                                        <tr>
+                                            <td style="display:none;"> </td>
+                                            <td style="display:none;"></td>
+                                            <td style="display:none;"></td>
+                                            <th>Nombre</th>
+                                            <th>Apellido Paterno</th>
+                                            <th>Apellido Materno</th>
+                                            <th>Clave</th>
+                                            <th>Departamento</th>
+                                            <th>Horario</th>
+                                            <th>Puesto</th>
+                                            <th>NSS</th>
+                                            <th>RFC</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% administrativos.forEach(administrativo=> { %>
+                                            <tr>
+                                                <!-- Campo oculto con los IDs para posibles interacciones -->
+                                                <td style="display:none;">
+                                                    <%= administrativo.id_administrativo %>
+                                                </td>
+                                                <td style="display:none;">
+                                                    <%= administrativo.id_departamento %>
+                                                </td>
+                                                <td style="display:none;">
+                                                    <%= administrativo.id_puesto %>
+                                                </td>
+
+                                                <!-- Mostrar el nombre, apellidos y demás información -->
+                                                <td>
+                                                    <%= administrativo.nombre %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.apellido_paterno %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.apellido_materno %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.clave %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.departamento %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.horario %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.puesto %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.nss %>
+                                                </td>
+                                                <td>
+                                                    <%= administrativo.rfc %>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="dropdownMenu<%= administrativo.id_administrativo %>"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu"
+                                                            aria-labelledby="dropdownMenu<%= administrativo.id_administrativo %>">
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#editModal<%= administrativo.id_administrativo %>">
+                                                                    <i class="bi bi-pencil"></i> Editar
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal<%= administrativo.id_administrativo %>">
+                                                                    <i class="bi bi-trash"></i> Eliminar
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal Agregar Administrativo -->
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalLabel">Agregar Administrativo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Formulario para agregar administrativo -->
+                        <form action="/sp_admin/Administrativos/crear" method="POST">
+                            <div class="mb-3">
+                                <label for="personSelect" class="form-label">Seleccionar Persona</label>
+                                <select id="personSelect" class="selectpicker" name="id_persona" required
+                                    data-show-subtext="true" data-live-search="true">
+                                    <option value="" selected="true">Seleccionar persona</option>
+                                    <% personsWithoutAdministrativos.forEach(person=> { %>
+                                        <option value="<%= person.id_persona %>">
+                                            <%= person.nombre %>
+                                                <%= person.apellido_paterno %>
+                                                    <%= person.apellido_materno %>
+                                                    -  <%= person.curp %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="departamentoAdmin" class="form-label">Departamento</label>
+                                <select class="selectpicker" id="departamentoAdmin" name="id_departamento" required
+                                    data-show-subtext="true" data-live-search="true"
+                                    data-departamentos='<%= JSON.stringify(departamentos) %>'>
+                                    <option value="">Seleccione un departamento</option>
+                                    <% departamentos.forEach(departamento=> { %>
+                                        <option value="<%= departamento.id %>">
+                                            <%= departamento.nombre %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="puestoAdmin" class="form-label">Puesto</label>
+                                <select class="selectpicker" id="puestoAdmin" name="id_puesto" required
+                                    data-show-subtext="true" data-live-search="true" disabled>
+                                    <option value="">Seleccione un puesto</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="claveAdmin" class="form-label">Clave</label>
+                                <input type="text" class="form-control" id="claveAdmin" name="clave" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="horarioAdmin" class="form-label">Horario</label>
+                                <input type="text" class="form-control" id="horarioAdmin" name="horario" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nssAdmin" class="form-label">NSS</label>
+                                <input type="text" class="form-control" id="nssAdmin" name="nss" required>
+                            </div>
+
+                            
+                            <div class="mb-3">
+                                <label for="rfcAdmin" class="form-label">RFC</label>
+                                <input type="text" class="form-control" id="rfcAdmin" name="rfc" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% administrativos.forEach(administrativo=> { %>
+            <div class="modal fade" id="editModal<%= administrativo.id_administrativo %>" tabindex="-1"
+                aria-labelledby="editModalLabel<%= administrativo.id_administrativo %>" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel<%= administrativo.id_administrativo %>">Editar
+                                Administrativo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Mostrar Nombre, Apellido Paterno y Materno (Solo lectura) -->
+                            <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" value="<%= administrativo.nombre %>" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Apellido Paterno</label>
+                                <input type="text" class="form-control" value="<%= administrativo.apellido_paterno %>"
+                                    readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Apellido Materno</label>
+                                <input type="text" class="form-control" value="<%= administrativo.apellido_materno %>"
+                                    readonly>
+                            </div>
+
+                            <!-- Formulario para editar los demás campos -->
+                            <form action="/sp_admin/Administrativos/editar" method="POST">
+                                <input type="hidden" name="id_administrativo"
+                                    value="<%= administrativo.id_administrativo %>">
+
+                                <!-- Select para Departamento -->
+                                <div class="mb-3">
+                                    <label for="departamentoAdminEdit<%= administrativo.id_administrativo %>"
+                                        class="form-label">Departamento</label>
+                                    <select class="selectpicker"
+                                        id="departamentoAdminEdit<%= administrativo.id_administrativo %>"
+                                        name="id_departamento" required data-show-subtext="true" data-live-search="true"
+                                        data-departamentos='<%= JSON.stringify(departamentos) %>'>
+                                        <option value="">Seleccione un departamento</option>
+                                        <% departamentos.forEach(departamento=> { %>
+                                            <option value="<%= departamento.id %>"
+                                                <%=Number(administrativo.id_departamento)===Number(departamento.id)
+                                                ? 'selected' : '' %>><%= departamento.nombre %>
+                                            </option>
+                                            <% }); %>
+                                    </select>
+                                </div>
+
+                                <!-- Select para Puesto -->
+                                <div class="mb-3">
+                                    <label for="puestoAdminEdit<%= administrativo.id_administrativo %>"
+                                        class="form-label">Puesto</label>
+                                    <select class="selectpicker"
+                                        id="puestoAdminEdit<%= administrativo.id_administrativo %>" name="id_puesto"
+                                        required data-show-subtext="true" data-live-search="true">
+                                        <option value="">Seleccione un puesto</option>
+                                        <% const deptoActual=departamentos.find(depto=> Number(depto.id) ===
+                                            Number(administrativo.id_departamento)); %>
+                                            <% if (deptoActual && deptoActual.puestos.length> 0) { %>
+                                                <% deptoActual.puestos.forEach(puesto=> { %>
+                                                    <option value="<%= puesto.id %>"
+                                                        <%=Number(administrativo.id_puesto)===Number(puesto.id)
+                                                        ? 'selected' : '' %>><%= puesto.nombre %>
+                                                    </option>
+                                                    <% }); %>
+                                                        <% } else { %>
+                                                            <option disabled>No hay puestos disponibles para este
+                                                                departamento</option>
+                                                            <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Campo Clave -->
+                                <div class="mb-3">
+                                    <label for="editClaveAdmin<%= administrativo.id_administrativo %>"
+                                        class="form-label">Clave</label>
+                                    <input type="text" class="form-control"
+                                        id="editClaveAdmin<%= administrativo.id_administrativo %>" name="clave"
+                                        value="<%= administrativo.clave %>" required>
+                                </div>
+
+                                <!-- Campo Horario -->
+                                <div class="mb-3">
+                                    <label for="editHorarioAdmin<%= administrativo.id_administrativo %>"
+                                        class="form-label">Horario</label>
+                                    <input type="text" class="form-control"
+                                        id="editHorarioAdmin<%= administrativo.id_administrativo %>" name="horario"
+                                        value="<%= administrativo.horario %>" required>
+                                </div>
+
+                                <!-- Campo NSS -->
+                                <div class="mb-3">
+                                    <label for="editNSSAdmin<%= administrativo.id_administrativo %>"
+                                        class="form-label">NSS</label>
+                                    <input type="text" class="form-control"
+                                        id="editNSSAdmin<%= administrativo.id_administrativo %>" name="nss"
+                                        value="<%= administrativo.nss %>" required>
+                                </div>
+
+                                <!-- Campo NSS -->
+                                <div class="mb-3">
+                                    <label for="editrfcAdmin<%= administrativo.id_administrativo %>"
+                                        class="form-label">NSS</label>
+                                    <input type="text" class="form-control"
+                                        id="editrfcAdmin<%= administrativo.id_administrativo %>" name="rfc"
+                                        value="<%= administrativo.rfc %>" required>
+                                </div>
+
+                                <!-- Botón para guardar -->
+                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+
+
+                <% administrativos.forEach(administrativo=> { %>
+                    <!-- Modal Eliminar Administrador -->
+                    <div class="modal fade" id="deleteModal<%= administrativo.id_administrativo %>" tabindex="-1"
+                        aria-labelledby="deleteModalLabel<%= administrativo.id_administrativo %>" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title"
+                                        id="deleteModalLabel<%= administrativo.id_administrativo %>">Eliminar
+                                        Administrador</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Estás seguro de que deseas eliminar a <strong>
+                                        <%= administrativo.nombre %>
+                                            <%= administrativo.apellido_paterno %>
+                                                <%= administrativo.apellido_materno %>
+                                    </strong>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                    <form action="/sp_admin/Administrativos/eliminar" method="POST" class="d-inline">
+                                        <input type="hidden" name="id_administrativo"
+                                            value="<%= administrativo.id_administrativo %>">
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+
+     <%- include('footer') %>
+    <script src="/assets/js/super_admin/administrativos.js"></script>
+</body>
+
+</html>

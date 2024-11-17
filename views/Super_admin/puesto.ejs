@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puestos CRUD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.3/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/puesto" class="breadcrumb-link">Puestos</a>
+                    <span class="mx-2">/</span>
+                    <span class="breadcrumb-current">Gestión de Puestos</span>
+                </div>
+
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Lista de Puestos</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#puestoModal">Agregar Puesto</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="personTable">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Puesto</th>
+                                        <th>Departamento</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% puestos.forEach(puesto => { %>
+                                        <tr>
+                                            <td><%= puesto.id_puesto %></td> <!-- Asumiendo que tienes un id para el puesto -->
+                                            <td><%= puesto.nombre %></td>
+                                            <td><%= puesto.departamento.nombre %></td> <!-- Esto debería funcionar ahora -->
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                        id="dropdownMenu<%= puesto.id_puesto %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= puesto.id_puesto %>">
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editModal<%= puesto.id_puesto %>">
+                                                                <i class="bi bi-pencil"></i> Editar
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#deleteModal<%= puesto.id_puesto %>">
+                                                                <i class="bi bi-trash"></i> Eliminar
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar puesto -->
+    <div class="modal fade" id="puestoModal" tabindex="-1" aria-labelledby="puestoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="puestoModalLabel">Agregar Puesto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addPuestoForm" action="/sp_admin/puesto/crear" method="POST">
+                        <div class="mb-3">
+                            <label for="addNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="addNombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addDepartamento" class="form-label">Departamento</label>
+                            <select id="addDepartamento" name="id_departamento" class="form-control" required>
+                                <% departamentos.forEach(departamento => { %>
+                                    <option value="<%= departamento.id_departamento %>"><%= departamento.nombre %></option>
+                                <% }); %>
+                            </select>                            
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Puesto -->
+    <% puestos.forEach(puesto => { %>
+        <div class="modal fade" id="editModal<%= puesto.id_puesto %>" tabindex="-1" aria-labelledby="editModalLabel<%= puesto.id_puesto %>" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel<%= puesto.id_puesto %>">Editar Puesto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editPuestoForm<%= puesto.id_puesto %>" action="/sp_admin/puesto/<%= puesto.id_puesto %>/editar" method="POST">
+                            <input type="hidden" name="id_puesto" value="<%= puesto.id_puesto %>">
+                            <div class="mb-3">
+                                <label for="editNombre<%= puesto.id_puesto %>" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="editNombre<%= puesto.id_puesto %>" name="nombre" value="<%= puesto.nombre %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDepartamento<%= puesto.id_puesto %>" class="form-label">Departamento</label>
+                                <select id="editDepartamento<%= puesto.id_puesto %>" name="id_departamento" class="form-control" required>
+                                    <% departamentos.forEach(departamento => { %>
+                                        <option value="<%= departamento.id_departamento %>" <%= puesto.id_departamento === departamento.id_departamento ? 'selected' : '' %>><%= departamento.nombre %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Actualizar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+
+    <!-- Modal de confirmación de eliminación -->
+    <% puestos.forEach(puesto => { %>
+        <div class="modal fade" id="deleteModal<%= puesto.id_puesto %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Puesto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el puesto <%= puesto.nombre %>? Esta acción no se puede deshacer.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <form action="/sp_admin/puesto/<%= puesto.id_puesto %>/eliminar" method="POST" style="display:inline;">
+                            <input type="hidden" name="id_puesto" value="<%= puesto.id_puesto %>">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+
+    <%- include('footer') %>
+
+</body>
+</html>

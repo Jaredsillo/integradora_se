@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALUMNOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <%- include('navbar') %><br><br>
+
+    <!-- Navbar -->
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/Alumnos" class="breadcrumb-link">Alumnos</a>
+                    <span class="mx-2">/</span>
+                    <span class="breadcrumb-current">Consulta de Alumnos</span>
+                </div>
+    
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Lista de Alumnos</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#personModal">Agregar Alumno</button>
+                        </div>
+    
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="personTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Apellido Paterno</th>
+                                        <th>Apellido Materno</th>
+                                        <th>Email</th>
+                                        <th>Promedio</th>
+                                        <th>Cuatrimestre</th>
+                                        <th>Fecha de Registro</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% students.forEach(student => { %>
+                                    <tr>
+                                        <td><%= student.nombre %></td>
+                                        <td><%= student.apellido_paterno %></td>
+                                        <td><%= student.apellido_materno %></td>
+                                        <td><%= student.email %></td>
+                                        <td><%= student.promedio %></td>
+                                        <td><%= student.cuatrimestre %></td>
+                                        <td><%= student.fecha_registro %></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenu<%= student.id_alumno %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= student.id_alumno %>">
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editModal<%= student.id_alumno %>">
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#deleteModal<%= student.id_alumno %>">
+                                                            <i class="bi bi-trash"></i> Eliminar
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal para agregar alumno -->
+<div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="personModalLabel">Agregar Alumno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPersonForm" action="/sp_admin/Alumnos/crear" method="POST">
+                    <div class="mb-3">
+                        <label for="personSelect" class="form-label">Seleccionar Persona</label>
+                        <select id="personSelect" class="selectpicker" name="id_persona" required data-show-subtext="true" data-live-search="true">
+                            <option value="" selected="true">Seleccionar persona</option>
+                            <% personsWithoutStudents.forEach(person => { %>
+                                <option value="<%= person.id_persona %>">
+                                    <%= person.nombre %> <%= person.apellido_paterno %> <%= person.apellido_materno %> - <%= person.curp %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+          
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+      
+                    <div class="mb-3">
+                        <label for="promedio" class="form-label">Promedio</label>
+                        <input type="number" step="0.01" class="form-control" id="editPromedio" name="promedio" min="0" max="10.00" name="promedio" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cuatrimestre" class="form-label">Cuatrimestre</label>
+                        <input type="number" class="form-control" id="cuatrimestre" name="cuatrimestre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_registro" class="form-label">Fecha de Registro</label>
+                        <input type="date" class="form-control" id="fecha_registro" name="fecha_registro" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% students.forEach(student => { %>
+    <!-- Modal para editar alumno -->
+    <div class="modal fade" id="editModal<%= student.id_alumno %>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Alumno</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPersonForm<%= student.id_alumno %>" method="POST" action="/sp_admin/Alumnos/<%= student.id_alumno %>/editar">
+
+                        <!-- Visualización de datos del alumno -->
+                        <div class="mb-3">
+                            <label for="viewNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="viewNombre" value="<%= student.nombre %>" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="viewApellidoPaterno" class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="viewApellidoPaterno" value="<%= student.apellido_paterno %>" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="viewApellidoMaterno" class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control" id="viewApellidoMaterno" value="<%= student.apellido_materno %>" disabled>
+                        </div>
+                               <!-- Campos editables -->
+                        <div class="mb-3">
+                            <label for="editFechaRegistro" class="form-label">Fecha de Registro</label>
+                            <input type="date" class="form-control" id="editFechaRegistro" name="fecha_registro" value="<%= student.fecha_registro %>" required>
+                        </div>
+
+                 
+        
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email" value="<%= student.email %>" required>
+                        </div>
+   
+                        <div class="mb-3">
+                            <label for="editPromedio" class="form-label">Promedio</label>
+                            <input type="number" step="0.01" class="form-control" id="editPromedio" name="promedio" min="0" max="10.00" value="<%= student.promedio %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCuatrimestre" class="form-label">Cuatrimestre</label>
+                            <input type="number" class="form-control" id="editCuatrimestre" name="cuatrimestre" value="<%= student.cuatrimestre %>" required>
+                        </div>
+
+                        <!-- Campo oculto para el ID del alumno -->
+                        <input type="hidden" name="id_alumno" value="<%= student.id_alumno %>">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" form="editPersonForm<%= student.id_alumno %>">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+
+
+
+    
+    <!-- Modal para eliminar alumno -->
+    <% students.forEach(student => { %>
+        <div class="modal fade" id="deleteModal<%= student.id_alumno %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Alumno</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar a <%= student.nombre %> <%= student.apellido_paterno %> <%= student.apellido_materno %>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Formulario para enviar el ID del alumno a eliminar -->
+                        <form action="/sp_admin/alumnos/eliminar" method="POST">
+                            <input type="hidden" name="id_alumno" value="<%= student.id_alumno %>">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <% }); %>
+
+    <%- include('footer') %>
+    <script src="/js/super_admin/alumno.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trámite de Apertura de Periodo</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <%- include('navbar') %><br><br>
+
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/apertura" class="breadcrumb-link">Trámite de Apertura de Periodo</a>
+                    <span class="mx-2">/</span>
+                </div>
+
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Preparación de Periodo</h5>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="preparationTable">
+                                <thead>
+                                    <tr>
+                                        <th>Proceso</th>
+                                        <th>Responsable</th>
+                                        <th>Rol</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Apertura del Periodo</td>
+                                        <td>Servicios Escolares</td>
+                                        <td>Registro de Alumnos, Grupos, Maestros, Materias</td>
+                                        <td>Realizado dentro de la plataforma, guiado por un calendario</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Autorización del Periodo</td>
+                                        <td>Rector</td>
+                                        <td>Autoriza la Apertura</td>
+                                        <td>Se asegura que todo esté conforme a los requisitos establecidos</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Asignación de Fechas</td>
+                                        <td>SEP</td>
+                                        <td>Provee las Fechas</td>
+                                        <td>Fechas establecidas de acuerdo al calendario educativo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Elaboración del Calendario</td>
+                                        <td>Planeación</td>
+                                        <td>Creación del Calendario</td>
+                                        <td>Desarrolla el calendario para el periodo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Revisión del Calendario</td>
+                                        <td>Directora Académica</td>
+                                        <td>Revisa el Calendario</td>
+                                        <td>Verifica que las fechas y actividades sean adecuadas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Autorización del Calendario</td>
+                                        <td>Rector</td>
+                                        <td>Autoriza el Calendario</td>
+                                        <td>Confirma que el calendario esté listo para su implementación</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('footer') %>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

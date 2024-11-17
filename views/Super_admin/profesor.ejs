@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profesor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <%- include('navbar') %><br><br>
+        <!-- Navbar -->
+        <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-center"><br><br>
+                        <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                        <span class="mx-2">/</span>
+                        <a href="/sp_admin/Profesores" class="breadcrumb-link">Profesores</a>
+                        <span class="mx-2">/</span>
+                        <span class="breadcrumb-current">Consulta de Profesores</span>
+                    </div>
+                    <!-- Tarjeta flotante con tabla -->
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title">Lista de Profesores</h5>
+                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#professorModal">Agregar Profesor</button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="personTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Apellido Paterno</th>
+                                            <th>Apellido Materno</th>
+                                            <th>Departamento</th>
+                                            <th>Puesto</th>
+                                            <th>Clave</th>
+                                            <th>Perfil</th>
+                                            <th>Email</th>
+                                            <th>No. Cédula</th>
+                                            <th>Programa Académico</th>
+                                            <th>NSS</th>
+                                            <th>RFC</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (profesores.length> 0) { %>
+                                            <% profesores.forEach(profesor=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= profesor.nombre %>
+                                                    </td> <!-- Campo Nombre -->
+                                                    <td>
+                                                        <%= profesor.apellido_paterno %>
+                                                    </td> <!-- Campo Apellido Paterno -->
+                                                    <td>
+                                                        <%= profesor.apellido_materno %>
+                                                    </td> <!-- Campo Apellido Materno -->
+                                                    <td>
+                                                        <%= profesor.departamento %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.puesto %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.clave %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.perfil %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.email %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.no_cedula %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.programa_academicos %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.nss %>
+                                                    </td>
+                                                    <td>
+                                                        <%= profesor.rfc %>
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-secondary dropdown-toggle"
+                                                                type="button"
+                                                                id="dropdownMenu<%= profesor.id_profesor %>"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu"
+                                                                aria-labelledby="dropdownMenu<%= profesor.id_profesor %>">
+                                                                <li>
+                                                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                                                        data-bs-target="#viewModal<%= profesor.id_profesor %>">
+                                                                        <i class="bi bi-eye"></i> Ver Detalles
+                                                                    </button>
+                                                                </li>
+                                                                <li>
+                                                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                                                        data-bs-target="#editModal<%= profesor.id_profesor %>">
+                                                                        <i class="bi bi-pencil"></i> Editar
+                                                                    </button>
+                                                                </li>
+                                                                <li>
+                                                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                                                        data-bs-target="#deleteModal<%= profesor.id_profesor %>">
+                                                                        <i class="bi bi-trash"></i> Eliminar
+                                                                    </button>
+                                                                </li>
+
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                                    <% } else { %>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Agregar Profesor -->
+        <div class="modal fade" id="professorModal" tabindex="-1" aria-labelledby="professorModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="professorModalLabel">Agregar Profesor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Formulario para agregar profesor -->
+                        <form action="/sp_admin/Profesores/crear" method="POST"> <!-- Cambia la acción según tu ruta -->
+                            <div class="mb-3">
+                                <label for="personSelect" class="form-label">Seleccionar Persona</label>
+                                <select id="personSelect" class="selectpicker" name="id_persona" required
+                                    data-show-subtext="true" data-live-search="true">
+                                    <option value="" selected="true">Seleccionar persona</option>
+                                    <% personsWithoutteacher.forEach(person=> { %>
+                                        <option value="<%= person.id_persona %>">
+                                            <%= person.nombre %>
+                                                <%= person.apellido_paterno %>
+                                                    <%= person.apellido_materno %>
+                                                    - <%= person.curp %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="departamentoProfesor" class="form-label">Departamento</label>
+                                <select class="selectpicker" id="departamentoProfesor" name="id_departamento" required
+                                    data-show-subtext="true" data-live-search="true"
+                                    data-departamentos='<%= JSON.stringify(departamentos) %>'>
+                                    <option value="">Seleccione un departamento</option>
+                                    <% departamentos.forEach(departamento=> { %>
+                                        <option value="<%= departamento.id %>">
+                                            <%= departamento.nombre %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="puestoProfesor" class="form-label">Puesto</label>
+                                <select class="selectpicker" id="puestoProfesor" name="id_puesto" required
+                                    data-show-subtext="true" data-live-search="true" disabled>
+                                    <option value="">Seleccione un puesto</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="claveProfesor" class="form-label">Clave</label>
+                                <input type="text" class="form-control" id="claveProfesor" name="clave" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="perfilProfesor" class="form-label">Perfil</label>
+                                <textarea class="form-control" id="perfilProfesor" name="perfil"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailProfesor" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="emailProfesor" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="noCedulaProfesor" class="form-label">No. Cédula</label>
+                                <input type="text" class="form-control" id="noCedulaProfesor" name="no_cedula" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="programaAcademicoProfesor" class="form-label">Programa Académico</label>
+                                <textarea class="form-control" id="programaAcademicoProfesor"
+                                    name="programa_academicos"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nssProfesor" class="form-label">NSS</label>
+                                <input type="text" class="form-control" id="nssProfesor" name="nss">
+                            </div>
+                            <div class="mb-3">
+                                <label for="rfcProfesor" class="form-label">RFC</label>
+                                <input type="text" class="form-control" id="rfcProfesor" name="rfc">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal Ver Detalles -->
+        <div class="modal fade" id="viewModal1" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewModalLabel">Detalles del Profesor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Mostrar detalles del profesor aquí -->
+                        <p><strong>Nombre:</strong> Profesor Ejemplo</p>
+                        <p><strong>Departamento:</strong> Departamento de Matemáticas</p>
+                        <!-- Agregar más detalles según sea necesario -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Modal Editar -->
+        <% profesores.forEach(profesor=> { %>
+            <div class="modal fade" id="editModal<%= profesor.id_profesor %>" tabindex="-1"
+                aria-labelledby="editModalLabel<%= profesor.id_profesor %>" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel<%= profesor.id_profesor %>">Editar Profesor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Mostrar Nombre, Apellido Paterno y Materno (Solo lectura) -->
+                            <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" value="<%= profesor.nombre %>" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Apellido Paterno</label>
+                                <input type="text" class="form-control" value="<%= profesor.apellido_paterno %>"
+                                    readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Apellido Materno</label>
+                                <input type="text" class="form-control" value="<%= profesor.apellido_materno %>"
+                                    readonly>
+                            </div>
+                            <!-- Formulario para editar los demás campos -->
+                            <form action="/sp_admin/Profesores/editar" method="POST">
+                                <input type="hidden" name="id_profesor" value="<%= profesor.id_profesor %>">
+                                <!-- Select para Departamento -->
+                                <div class="mb-3">
+                                    <label for="departamentoProfesorEdit<%= profesor.id_profesor %>"
+                                        class="form-label">Departamento</label>
+                                    <select class="selectpicker"
+                                        id="departamentoProfesorEdit<%= profesor.id_profesor %>" name="id_departamento"
+                                        required data-show-subtext="true" data-live-search="true"
+                                        data-departamentos='<%= JSON.stringify(departamentos) %>'>
+                                        <option value="">Seleccione un departamento</option>
+                                        <% departamentos.forEach(departamento=> { %>
+                                            <option value="<%= departamento.id %>"
+                                                <%=Number(profesor.id_departamento)===Number(departamento.id)
+                                                ? 'selected' : '' %>><%= departamento.nombre %>
+                                            </option>
+                                            <% }); %>
+                                    </select>
+                                </div>
+
+                                <!-- Select para Puesto -->
+                                <div class="mb-3">
+                                    <label for="puestoProfesorEdit<%= profesor.id_profesor %>"
+                                        class="form-label">Puesto</label>
+                                    <select class="selectpicker" id="puestoProfesorEdit<%= profesor.id_profesor %>"
+                                        name="id_puesto" required data-show-subtext="true" data-live-search="true">
+                                        <option value="">Seleccione un puesto</option>
+                                        <% const deptoActual=departamentos.find(depto=> Number(depto.id) ===
+                                            Number(profesor.id_departamento)); %>
+                                            <% if (deptoActual && deptoActual.puestos.length> 0) { %>
+                                                <% deptoActual.puestos.forEach(puesto=> { %>
+                                                    <option value="<%= puesto.id %>"
+                                                        <%=Number(profesor.id_puesto)===Number(puesto.id) ? 'selected'
+                                                        : '' %>><%= puesto.nombre %>
+                                                    </option>
+                                                    <% }); %>
+                                                        <% } else { %>
+                                                            <option disabled>No hay puestos disponibles para este
+                                                                departamento</option>
+                                                            <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Campo Clave -->
+                                <div class="mb-3">
+                                    <label for="editClaveProfesor<%= profesor.id_profesor %>"
+                                        class="form-label">Clave</label>
+                                    <input type="text" class="form-control"
+                                        id="editClaveProfesor<%= profesor.id_profesor %>" name="clave"
+                                        value="<%= profesor.clave %>" required>
+                                </div>
+
+                                <!-- Campo Perfil -->
+                                <div class="mb-3">
+                                    <label for="editPerfilProfesor<%= profesor.id_profesor %>"
+                                        class="form-label">Perfil</label>
+                                    <textarea class="form-control" id="editPerfilProfesor<%= profesor.id_profesor %>"
+                                        name="perfil" required><%= profesor.perfil %></textarea>
+                                </div>
+
+                                <!-- Campo Email -->
+                                <div class="mb-3">
+                                    <label for="editEmailProfesor<%= profesor.id_profesor %>"
+                                        class="form-label">Email</label>
+                                    <input type="email" class="form-control"
+                                        id="editEmailProfesor<%= profesor.id_profesor %>" name="email"
+                                        value="<%= profesor.email %>" required>
+                                </div>
+
+                                <!-- Campo No. de Cédula -->
+                                <div class="mb-3">
+                                    <label for="editCedulaProfesor<%= profesor.id_profesor %>" class="form-label">No. de
+                                        Cédula</label>
+                                    <input type="text" class="form-control"
+                                        id="editCedulaProfesor<%= profesor.id_profesor %>" name="no_cedula"
+                                        value="<%= profesor.no_cedula %>" required>
+                                </div>
+
+                                <!-- Campo Programas Académicos -->
+                                <div class="mb-3">
+                                    <label for="editProgramasProfesor<%= profesor.id_profesor %>"
+                                        class="form-label">Programas Académicos</label>
+                                    <textarea class="form-control" id="editProgramasProfesor<%= profesor.id_profesor %>"
+                                        name="programa_academicos"
+                                        required><%= profesor.programa_academicos %></textarea>
+                                </div>
+
+                                <!-- Campo NSS -->
+                                <div class="mb-3">
+                                    <label for="editNSSProfesor<%= profesor.id_profesor %>"
+                                        class="form-label">NSS</label>
+                                    <input type="text" class="form-control"
+                                        id="editNSSProfesor<%= profesor.id_profesor %>" name="nss"
+                                        value="<%= profesor.nss %>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editrfcProfesor<%= profesor.id_profesor %>"
+                                        class="form-label">RFC</label>
+                                    <input type="text" class="form-control"
+                                        id="editrfcProfesor<%= profesor.id_profesor %>" name="rfc"
+                                        value="<%= profesor.rfc %>" required>
+                                </div>
+
+                                <!-- Botón para guardar -->
+                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+
+
+                <!-- Modal Eliminar -->
+                <% profesores.forEach(profesor=> { %>
+                    <div class="modal fade" id="deleteModal<%= profesor.id_profesor %>" tabindex="-1"
+                        aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Profesor</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Está seguro de que desea eliminar al profesor <strong>
+                                            <%= profesor.nombre %>
+                                        </strong>?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                    <form action="/sp_admin/Profesores/eliminar" method="POST">
+                                        <input type="hidden" name="id_profesor" value="<%= profesor.id_profesor %>">
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                    
+                    <%- include('footer') %>
+
+                     <script src="/assets/js/super_admin/alumno.js"></script>
+                     <script src="/assets/js/super_admin/departamentos_puestos.js"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel de Estudio</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- Bootstrap Select CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+</head>
+<body>
+    <%- include('navbar') %><br><br>
+    <!-- Navbar -->
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/NivelAcademico" class="breadcrumb-link">Nivel de Estudio</a>
+                    <span class="mx-2">/</span>
+                    <span class="breadcrumb-current">Nivel de Estudio</span>
+                </div>
+    
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Lista de Niveles Academicos</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#personModal">Agregar Nivel Academico</button>
+                        </div>
+    
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="personTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Descripcion</th>
+                                        <th>sigla </th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% niveles.forEach(nivel => { %>
+                                    <tr>
+                                        <td><%= nivel.nombre %></td>
+                                        <td><%= nivel.descripcion %></td>
+                                        <td><%= nivel.sigla %></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenu<%= nivel.id_nivel_estudio %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= nivel.id_nivel_estudio %>">
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editModal<%= nivel.id_nivel_estudio %>">
+                                                            <i class="bi bi-pencil"></i> Editar
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#deleteModal<%= nivel.id_nivel_estudio %>">
+                                                            <i class="bi bi-trash"></i> Eliminar
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="personModalLabel">Registro de Nivel Academico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addNivelForm" action="/sp_admin/NivelAcademico/crear" method="POST">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripcion</label>
+                            <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sigla" class="form-label">Siglas</label>
+                            <input type="text" class="form-control" id="sigla" name="sigla" required>
+                        </div>
+    
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Agregar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <% niveles.forEach(nivel => { %>
+        <div class="modal fade" id="deleteModal<%= nivel.id_nivel_estudio %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Alumno</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el registro?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Formulario para enviar el ID del alumno a eliminar -->
+                        <form action="/sp_admin/NivelAcademico/eliminar" method="POST">
+                            <input type="hidden" name="id_nivel_estudio" value="<%= nivel.id_nivel_estudio %>">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <% }); %>
+
+
+    <% niveles.forEach(nivel => { %>
+        <!-- Modal para editar alumno -->
+        <div class="modal fade" id="editModal<%= nivel.id_nivel_estudio %>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Nivel de Estudio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editPersonForm<%= nivel.id_nivel_estudio %>" method="POST" action="/sp_admin/NivelAcademico/<%= nivel.id_nivel_estudio %>/editar">
+    
+                            <div class="mb-3">
+                                <label for="editNombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="editNombre" name="nombre" value="<%= nivel.nombre %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDescripcion" class="form-label">Descripcion</label>
+                                <input type="text" class="form-control" id="editDescripcion" name="descripcion" value="<%= nivel.descripcion %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSiglas" class="form-label">Siglas</label>
+                                <input type="text" class="form-control" id="editSiglas" name="sigla" value="<%= nivel.sigla %>" required>
+                            </div>
+    
+                            <!-- Campo oculto para el ID del alumno -->
+                            <input type="hidden" name="id_nivel_estudio" value="<%= nivel.id_nivel_estudio %>">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary" form="editPersonForm<%= nivel.id_nivel_estudio %>">Actualizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+
+    <%- include('footer') %>
+</body>
+   
+    
+</html>

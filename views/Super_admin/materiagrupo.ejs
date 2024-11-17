@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Materias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %> <br> <br>
+    <div class="container mt-5">
+        <div class="page-inner">
+            <div class="d-flex align-items-center mb-3">
+                <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                <span class="mx-2">/</span>
+                <a href="/sp_admin/grupoMateria" class="breadcrumb-link">Asignación de Materias al Grupo</a>
+            </div>
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Columna Izquierda -->
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Programa Académico</h6>
+                                    <select id="selectPrograma" class="selectpicker" name="id_programa_academico" required data-show-subtext="true" data-live-search="true">
+                                        <option value="" selected="true">Seleccionar Programa</option>
+                                        <% programas.forEach(programa=> { %>
+                                            <option value="<%= programa.id_programa_academico %>">
+                                                <%= programa.Titulo_tsu + ' ' + programa.Titulo_Ing %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                    <h6 class="card-title">Periodo</h6>
+                                    <select id="selectPeriodo" class="selectpicker" name="id_periodo" required data-show-subtext="true" data-live-search="true">
+                                        <option value="" selected="true">Seleccionar Periodo</option>
+                                        <% periodos.forEach(periodo=> { %>
+                                            <option value="<%= periodo.id_periodo %>">
+                                                <%= periodo.periodo %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                    <h6>Listado de Grupos</h6>
+                                    <select class="form-control" size="5" id="selectGrupo">
+                                        <option value="" selected>Seleccionar Grupo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha -->
+                        <div class="col-md-6">
+                      
+                            <p id="grupoSeleccionado">Selecciona un grupo</p>
+                            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#mapaCurricularModal">
+                                <i class="bi bi-plus"></i> Agregar materia del mapa curricular
+                            </button>
+
+                            <!-- Tabla y botones debajo del contenido superior -->
+                            <h6>Materias asignadas</h6>
+                            <table class="table table-bordered table-hover" id="GmTable">
+                                <thead>
+                                    <tr>
+                                        <th>Materia</th>
+                                        <th>Horario</th>
+                                        <th>Profesor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Contenido dinámico cargado con JavaScript -->
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-between mt-3">
+                                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#ModalQuitarMateria" onclick="cargarMateriasParaEliminar(selectGrupo.value)">Quitar Materia</button>
+                                <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ModalHorario">Asignar Horario</button>
+                                
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="mapaCurricularModal" tabindex="-1" aria-labelledby="mapaCurricularModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Formulario -->
+                                    <form method="post" id="grupoMateriaForm">
+                                        <div class="modal-header">
+                                            <h5 id="mapaCurricularModalLabel">Mapa Curricular</h5>
+                                            <!-- Mostrar Programa Académico seleccionado -->
+                                            <h6 id="modalPrograma">Programa Académico: </h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <div class="modal-body">
+                                            <!-- Selector de Profesor (opcional si no se requiere) -->
+                                            <select id="nivelSelect" class="selectpicker ms-auto" name="id_profesor" required data-show-subtext="true" data-live-search="true">
+                                                <option value="" selected="true">Selecciona un Profesor</option>
+                                                <% tutores.forEach(tutor=> { %>
+                                                    <option value="<%= tutor.id_profesor %>">
+                                                        <%= tutor.nombre %>
+                                                    </option>
+                                                <% }); %>
+                                            </select>
+                                            <!-- Selector de Tipo -->
+                                            <div class="mb-3">
+                                                <label for="tipoSelect" class="form-label">Tipo</label>
+                                                <select class="form-select" id="tipoSelect" name="tipo" required>
+                                                    <option value="">Seleccionar Tipo</option>
+                                                    <option value="Ordinaria">Ordinaria</option>
+                                                    <option value="Extraordinaria">Extraordinaria</option>
+                                                </select>
+                                            </div>
+                                            <!-- Inputs ocultos -->
+                                            <input type="hidden" name="id_grupo" id="id_grupo" value="">
+                                            <!-- Tabla de materias -->
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Materia</th>
+                                                        <th>Cuatrimestre</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="mapaCurricularTableBody">
+                                                    <!-- Contenido dinámico -->
+                                                </tbody>
+                                            </table>
+                                            <!-- Botón de envío -->
+                                            <button type="submit" class="btn btn-primary">Agregar</button>
+                                        </div>
+                                    </form>
+                                    <!-- Fin del formulario -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="ModalHorario" tabindex="-1" aria-labelledby="ModalHorarioLabel" aria-hidden="true">
+                            <form id="grupoHorarioForm"  method="POST">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <!-- Cabecera del Modal -->
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="ModalHorarioLabel">Asignar Horario</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <!-- Cuerpo del Modal -->
+                                        <div class="modal-body">
+                                            <!-- Selección de Bloque -->
+                                            <div class="mb-3">
+                                                <label for="bloqueSelect" class="form-label">Seleccionar Bloque</label>
+                                                <select id="bloqueSelect" class="selectpicker" name="idBloque" required data-show-subtext="true" data-live-search="true">
+                                                    <option value="" selected="true">Seleccionar Bloque</option>
+                                                    <% bloques.forEach(item => { %>
+                                                        <option value="<%= item.idBloque %>">
+                                                            <%= item.Nombre %> - <%= item.HoraInicio %> a <%= item.HoraFin %>
+                                                        </option>
+                                                    <% }); %>
+                                                </select>
+                                            </div>
+                                            <!-- Selección de Día -->
+                                            <div class="mb-3">
+                                                <label for="dia" class="form-label">Día</label>
+                                                <select id="dia" class="form-select" name="dia" required>
+                                                    <option value="" selected="true">Seleccionar día</option>
+                                                    <option value="Lunes">Lunes</option>
+                                                    <option value="Martes">Martes</option>
+                                                    <option value="Miércoles">Miércoles</option>
+                                                    <option value="Jueves">Jueves</option>
+                                                    <option value="Viernes">Viernes</option>
+                                                    <option value="Sabado">Sábado</option>
+                                                    <option value="Domingo">Domingo</option>
+                                                </select>
+                                            </div>
+                                            <!-- Tabla de Materias con Radio Buttons -->
+                                            <div class="table-responsive">     
+                                                <table class="table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Seleccionar</th>
+                                                            <th>Materia</th>
+                                                            <th>Profesor</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="horariosTableBody">
+                                                        <!-- Contenido dinámico cargado con JavaScript -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- Pie del Modal -->
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Asignar Horario</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Modal para mostrar y eliminar materias -->
+<div class="modal fade" id="ModalQuitarMateria" tabindex="-1" aria-labelledby="ModalQuitarMateriaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalQuitarMateriaLabel">Eliminar Materia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Materia</th>
+                                <th>Profesor</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materiasEliminarTableBody">
+                            <!-- Contenido dinámico cargado con JavaScript -->
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Scripts -->
+    <script>
+        // Manejo de selección de grupo y actualización de interfaz
+        const selectPrograma = document.getElementById('selectPrograma');
+        const selectPeriodo = document.getElementById('selectPeriodo');
+        const selectGrupo = document.getElementById('selectGrupo');
+        const grupoSeleccionado = document.getElementById('grupoSeleccionado');
+
+        let selectedGrupoId = null;
+
+        async function updateGrupos() {
+            const programaId = selectPrograma.value;
+            const periodoId = selectPeriodo.value;
+
+            selectGrupo.innerHTML = '';
+
+            if (programaId && periodoId) {
+                try {
+                    const response = await fetch(`/sp_admin/api/grupos?idPrograma=${programaId}&idPeriodo=${periodoId}`);
+                    const grupos = await response.json();
+
+                    grupos.forEach(grupo => {
+                        const option = document.createElement('option');
+                        option.value = grupo.idGrupo; // Cambiado a id_grupo
+                        option.textContent = grupo.nombre;
+                        selectGrupo.appendChild(option);
+                    });
+
+                    // Limpiar selección previa
+                    selectedGrupoId = null;
+                    grupoSeleccionado.textContent = 'Selecciona un grupo';
+                    document.getElementById('id_grupo').value = '';
+                } catch (error) {
+                    console.error('Error al cargar grupos:', error);
+                }
+            } else {
+                selectGrupo.innerHTML = '';
+                selectedGrupoId = null;
+                grupoSeleccionado.textContent = 'Selecciona un grupo';
+                document.getElementById('id_grupo').value = '';
+                const tbody = document.querySelector('#GmTable tbody');
+                tbody.innerHTML = '';
+            }
+        }
+
+        selectPrograma.addEventListener('change', updateGrupos);
+        selectPeriodo.addEventListener('change', updateGrupos);
+
+        selectGrupo.addEventListener('change', () => {
+            const selectedOption = selectGrupo.options[selectGrupo.selectedIndex];
+            selectedGrupoId = selectedOption.value;
+            const selectedGrupoName = selectedOption.textContent;
+            grupoSeleccionado.textContent = `Grupo Seleccionado: ${selectedGrupoName}`;
+
+            // Establecer el valor del input oculto id_grupo
+            document.getElementById('id_grupo').value = selectedGrupoId;
+        });
+
+        selectGrupo.addEventListener('change', updateGrupoMaterias);
+
+        const grupoMateriaForm = document.getElementById('grupoMateriaForm');
+const grupoHorarioForm = document.getElementById('grupoHorarioForm');
+
+async function updateGrupoMaterias() {
+  const grupoId = selectGrupo.value;
+  if (grupoId) {
+    try {
+      const response = await fetch(`/sp_admin/api/grupoMaterias?idGrupo=${grupoId}`);
+      const data = await response.json();
+      renderGrupoMaterias(data);
+    } catch (error) {
+      console.error('Error fetching grupoMaterias:', error);
+    }
+  } else {
+    renderGrupoMaterias([]); // Si no hay grupo seleccionado, limpiar la tabla
+  }
+}
+
+// Interceptar el envío del formulario grupoMateriaForm
+grupoMateriaForm.addEventListener('submit', async function(event) {
+  event.preventDefault(); // Prevenir el envío estándar del formulario
+
+  // Obtener los datos del formulario
+  const formData = new FormData(grupoMateriaForm);
+  const data = {};
+
+  formData.forEach((value, key) => {
+    data[key] = value; // Convertir FormData a un objeto normal
+  });
+
+  try {
+    // Enviar los datos como JSON
+    const response = await fetch('/sp_admin/grupoMateria/crear', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // Asegúrate de que el servidor espere JSON
+      },
+      body: JSON.stringify(data) // Convertir los datos a JSON
+    });
+
+    if (response.ok) {
+      updateGrupoMaterias(); // Llamar a la función para actualizar los datos
+    } else {
+      const errorText = await response.text();
+      console.error('Error en la creación del grupo: ', errorText);
+    }
+  } catch (error) {
+    console.error('Error al hacer el insert:', error);
+  }
+});
+
+// Interceptar el envío del formulario grupoHorarioForm
+grupoHorarioForm.addEventListener('submit', async function(event) {
+  event.preventDefault(); // Prevenir el envío estándar del formulario
+
+  // Obtener los datos del formulario
+  const formData = new FormData(grupoHorarioForm);
+  const data = {};
+
+  formData.forEach((value, key) => {
+    data[key] = value; // Convertir FormData a un objeto normal
+  });
+
+  try {
+    // Enviar los datos como JSON
+    const response = await fetch('/sp_admin/grupoMateria/crear_horario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // Asegúrate de que el servidor espere JSON
+      },
+      body: JSON.stringify(data) // Convertir los datos a JSON
+    });
+
+    if (response.ok) {
+        
+      updateGrupoMaterias(); // Llamar a la función para actualizar los datos
+    } else {
+      const errorText = await response.text();
+      console.error('Error en la creación del horario: ', errorText);
+    }
+  } catch (error) {
+    console.error('Error al hacer el insert:', error);
+  }
+});
+
+
+function renderGrupoMaterias(data) {
+    const tbody = document.querySelector('#GmTable tbody');
+    tbody.innerHTML = '';
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.materia}</td>
+<td>
+  ${item.diaHorario && item.horaInicio && item.horaFin 
+    ? `${item.diaHorario}: ${item.horaInicio} - ${item.horaFin}` 
+    : "No hay registros"}
+</td>  
+          <td>${item.profesor} ${item.apellidoPaterno} ${item.apellidoMaterno}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+        // Manejo del modal y carga de materias
+        const mapaCurricularModal = document.getElementById('mapaCurricularModal');
+    const modalPrograma = document.getElementById('modalPrograma');
+    const mapaCurricularTableBody = document.getElementById('mapaCurricularTableBody');
+
+    mapaCurricularModal.addEventListener('show.bs.modal', function(event) {
+        const programaId = selectPrograma.value;
+        if (!programaId) {
+            alert('Por favor, selecciona un grupo.');
+            event.preventDefault(); // Prevent the modal from showing
+            return;
+        }
+
+        // Mostrar el nombre del Programa Académico en el modal
+        const selectedProgramaOption = selectPrograma.options[selectPrograma.selectedIndex];
+        modalPrograma.textContent = `Programa Académico: ${selectedProgramaOption.textContent}`;
+
+        // Fetch and populate the Mapa Curricular
+        fetchMapaCurricular(programaId);
+    });
+
+    // Define the asynchronous function separately
+    async function fetchMapaCurricular(programaId) {
+        try {
+            const response = await fetch(`/sp_admin/api/mapaCurricular?idPrograma=${programaId}`);
+            const materias = await response.json();
+
+            // Limpiar contenido previo
+            mapaCurricularTableBody.innerHTML = '';
+
+            // Poblar la tabla con las materias
+            materias.forEach(materia => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <input type="radio" name="idMapaCurricular" value="${materia.id_mapa_curricular}" required>
+                        ${materia.materia}
+                    </td>
+                    <td>${materia.cuatrimestre}°</td>
+                `;
+                mapaCurricularTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error al cargar el Mapa Curricular:', error);
+        }
+    }
+
+    async function cargarMateriasParaEliminar(grupoId) {
+    try {
+        const response = await fetch(`/sp_admin/api/grupoMaterias_sin_horario?idGrupo=${grupoId}`);
+        const data = await response.json();
+        const tbody = document.getElementById('materiasEliminarTableBody');
+        tbody.innerHTML = ''; // Limpiar contenido previo
+
+        console.log("Datos recibidos:", data); // Verifica qué datos están llegando
+
+        // Recuerda que data es un arreglo de objetos, y no necesitas acceder a una propiedad "GrupoMaterias"
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.materia}</td>      
+   <td>${item.profesor} ${item.apellidoPaterno} ${item.apellidoMaterno}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarMateria(${item.idGrupoMateria})">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error al cargar materias para eliminar:', error);
+    }
+}
+
+
+async function eliminarMateria(idGrupoMateria) {
+
+    console.log("ID recibido por la función eliminarMateria:", idGrupoMateria);
+
+    if (confirm('¿Estás seguro de que quieres eliminar esta materia?')) {
+        try {
+            // Enviar la solicitud DELETE con idGrupoMateria en la URL
+            const response = await fetch(`/sp_admin/api/eliminarGrupoMateria?idGrupoMateria=${idGrupoMateria}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (response.ok) {
+                alert('Materia eliminada con éxito');
+                // Actualiza la lista de materias después de eliminar
+                updateGrupoMaterias(); // Llamar a la función para actualizar los datos
+                cargarMateriasParaEliminar(selectGrupo.value);
+            } else {
+                alert('Error al eliminar la materia');
+            }
+        } catch (error) {
+            console.error('Error al eliminar la materia:', error);
+        }
+    }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+        const ModalHorario = document.getElementById('ModalHorario');
+        const horariosTableBody = document.getElementById('horariosTableBody');
+        const selectGrupo = document.getElementById('selectGrupo');
+
+        // Evento para cargar materias al abrir el modal
+        ModalHorario.addEventListener('show.bs.modal', function(event) {
+            const grupoId = selectGrupo.value;
+            if (!grupoId) {
+                alert('Por favor, selecciona un grupo antes de asignar un horario.');
+                event.preventDefault(); // Evitar que el modal se muestre
+                return;
+            }
+
+            // Fetch y poblar las materias del grupo seleccionado
+            cargarMateriasParaAsignarHorario(grupoId);
+        });
+
+        // Función para cargar materias en la tabla del modal
+        async function cargarMateriasParaAsignarHorario(grupoId) {
+            try {
+                const response = await fetch(`/sp_admin/api/grupoMaterias_sin_horario?idGrupo=${grupoId}`);
+                if (!response.ok) throw new Error('Error en la solicitud');
+                const data = await response.json();
+                horariosTableBody.innerHTML = ''; // Limpiar contenido previo
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <input type="radio" name="idGrupoMateria" value="${item.idGrupoMateria}" required>
+                        </td>
+                        <td>${item.materia}</td>
+                      <td>${item.profesor} ${item.apellidoPaterno} ${item.apellidoMaterno}</td>
+                    `;
+                    horariosTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar materias para asignar horario:', error);
+                alert('Hubo un error al cargar las materias.');
+            }
+        }
+    });
+
+
+
+</script>
+
+
+
+    <%- include('footer') %>
+</body>
+
+</html>

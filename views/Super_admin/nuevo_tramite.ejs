@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Trámites</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+        <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/nuevo_tramite" class="breadcrumb-link">Nuevo Trámite</a>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row">
+
+                            <!-- Columna Izquierda -->
+                            <div class="col-md-6">
+
+                                <h5 class="card-title">Nuevo Trámites: Búsquedas de alumnos</h5>
+                                <br>
+
+                                <!-- Select de Alumnos -->
+                                <div class="form-group mb-3">
+                                    <label for="selectAlumno">Selecciona un Alumno:</label>
+                                    <select id="selectAlumno" class="form-control selectpicker" data-live-search="true">
+                                        <option value="" selected>Seleccione un Alumno</option>
+                                        <% Alumnotramite.forEach((item)=> { %>
+                                            <option value="<%= item.id_alumno %>" data-matricula="<%= item.matricula %>"
+                                                data-nombre="<%= item.nombre %>" data-pa="<%= item.apellido_paterno %>"
+                                                data-pm="<%= item.apellido_materno %>"
+                                                data-programa="<%= item.programa_academico %>">
+                                                <%= item.nombre %>
+                                                    <%= item.apellido_paterno %>
+                                                        <%= item.apellido_materno %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                </div>
+
+                                <!-- Tabla de Alumnos -->
+                                <table class="table table-bordered table-hover" id="personTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Matricula</th>
+                                            <th>Nombre</th>
+                                            <th>Apellido Paterno</th>
+                                            <th>Apellido Materno</th>
+                                            <th>Programa Académico</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% Alumnotramite.forEach((item)=> { %>
+                                            <tr data-idalumno="<%= item.id_alumno %>"
+                                                data-matricula="<%= item.matricula %>" data-nombre="<%= item.nombre %>"
+                                                data-pa="<%= item.apellido_paterno %>"
+                                                data-pm="<%= item.apellido_materno %>"
+                                                data-programa="<%= item.programa_academico %>">
+                                                <td>
+                                                    <%= item.matricula %>
+                                                </td>
+                                                <td>
+                                                    <%= item.nombre %>
+                                                </td>
+                                                <td>
+                                                    <%= item.apellido_paterno %>
+                                                </td>
+                                                <td>
+                                                    <%= item.apellido_materno %>
+                                                </td>
+                                                <td>
+                                                    <%= item.programa_academico %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Columna Derecha -->
+                            <div class="col-md-6">
+                                <form action="/sp_admin/Nuevo_tramite/crear" method="POST">
+                                    <div class="card p-3">
+                                        <h5 class="card-title">Datos del alumno seleccionado</h5>
+                                        <input type="hidden" id="id_alumno" name="IdAlumno">
+
+                                        <div class="form-group mb-3">
+                                            <label for="matricula" class="form-label">Matrícula:</label>
+                                            <input type="text" id="matricula" class="form-control form-control-sm"
+                                                disabled>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="nombre" class="form-label">Nombre:</label>
+                                            <input type="text" id="nombre" class="form-control form-control-sm"
+                                                disabled>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="pa" class="form-label">PA:</label>
+                                            <input type="text" id="pa" class="form-control form-control-sm" disabled>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="selectTramite" class="form-label">Trámite:</label>
+                                            <select id="selectTramite" class="form-control form-control-sm selectpicker"
+                                                name="IdTramite" required data-show-subtext="true"
+                                                data-live-search="true">
+                                                <option value="" selected>Seleccione Trámite</option>
+                                                <% tramites.forEach((tramite)=> { %>
+                                                    <option value="<%= tramite.IdTramite %>">
+                                                        <%= tramite.Nombre %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="selectPeriodo" class="form-label">Periodo:</label>
+                                            <select id="selectPeriodo" class="form-control form-control-sm selectpicker"
+                                                name="idPeriodo" required data-show-subtext="true"
+                                                data-live-search="true">
+                                                <option value="" selected>Seleccione Periodo</option>
+                                                <% periodos.forEach((periodo)=> { %>
+                                                    <option value="<%= periodo.id_periodo %>">
+                                                        <%= periodo.periodo %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="estatus" class="form-label">Estatus:</label>
+                                            <input type="text" id="estatus" name="estatus"
+                                                class="form-control form-control-sm" value="En proceso" readonly>
+                                        </div>
+
+                                        <div class="text-center mt-3">
+                                            <button type="submit" class="btn btn-primary btn-sm">Asignar
+                                                Trámite</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                            <div style="text-align: left;">
+                                <a href="/sp_admin/seguimiento_tramite" class="btn btn-outline-secondary">Regresar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('footer') %>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const selectAlumno = document.getElementById("selectAlumno");
+                    const tableRows = document.querySelectorAll("#personTable tbody tr");
+                    const id_alumno = document.getElementById("id_alumno");
+                    const matricula = document.getElementById("matricula");
+                    const nombre = document.getElementById("nombre");
+                    const pa = document.getElementById("pa");
+                    const programa = document.getElementById("Programa_Nombre");
+                    // Función para llenar el formulario
+                    function fillForm(data) {
+                        id_alumno.value = data.id_alumno;
+                        matricula.value = data.matricula;
+                        nombre.value = data.nombre;
+                        pa.value = data.pa;
+                    }
+                    // Evento para el select de alumnos
+                    selectAlumno.addEventListener("change", function () {
+                        const selectedOption = selectAlumno.options[selectAlumno.selectedIndex];
+                        if (selectedOption.value) {
+                            fillForm({
+                                id_alumno: selectedOption.value,
+                                matricula: selectedOption.getAttribute('data-matricula'),
+                                nombre: selectedOption.getAttribute('data-nombre'),
+                                pa: selectedOption.getAttribute('data-pa')
+                            });
+                        } else {
+                            fillForm({
+                                id_alumno: '',
+                                matricula: '',
+                                nombre: '',
+                                pa: ''
+                            });
+                        }
+                    });
+                    // Evento para las filas de la tabla
+                    tableRows.forEach(row => {
+                        row.addEventListener("click", function () {
+                            const data = {
+                                id_alumno: row.getAttribute('data-idalumno'),
+                                matricula: row.getAttribute('data-matricula'),
+                                nombre: row.getAttribute('data-nombre'),
+                                pa: row.getAttribute('data-pa')
+                            };
+                            fillForm(data);
+                            selectAlumno.value = data.id_alumno;
+                            $('.selectpicker').selectpicker('refresh');
+                        });
+                    });
+                });
+            </script>
+</body>
+
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEPARTAMENTO </title>
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <%- include('navbar') %><br><br>
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <!-- Breadcrumbs -->
+        <div class="container">
+            <div class="page-inner">
+        <div class="d-flex align-items-center">
+            <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+            <span class="mx-2">/</span>
+            <a href="/sp_admin/departamento" class="breadcrumb-link">Departamentos</a>
+            <span class="mx-2">/</span>
+            <span class="breadcrumb-current">Consulta de Departamentos</span>
+        </div>
+
+        <!-- Tarjeta flotante con tabla -->
+        <div class="card shadow mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title">Lista de Departamentos</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#departamentoModal">Agregar Departamento</button>
+                </div>
+
+                <!-- Tabla de departamentos -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="personTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Sigla</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% departamentos.forEach(departamento => { %>
+                            <tr>
+                                <td><%= departamento.id_departamento %></td>
+                                <td><%= departamento.nombre %></td>
+                                <td><%= departamento.sigla %></td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                            id="dropdownMenu<%= departamento.id_departamento %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= departamento.id_departamento %>">
+                                            <li>
+                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal<%= departamento.id_departamento %>">
+                                                    <i class="bi bi-pencil"></i> Editar
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal<%= departamento.id_departamento %>">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar departamento -->
+    <div class="modal fade" id="departamentoModal" tabindex="-1" aria-labelledby="departamentoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="departamentoModalLabel">Agregar Departamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/sp_admin/departamento/crear" method="POST">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre del Departamento</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sigla" class="form-label">Sigla</label>
+                            <input type="text" class="form-control" id="sigla" name="sigla" required>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Agregar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% departamentos.forEach(departamento => { %>
+        <!-- Modal para editar departamento -->
+        <div class="modal fade" id="editModal<%= departamento.id_departamento %>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Departamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/sp_admin/departamento/<%= departamento.id_departamento %>/editar" method="POST">
+                            <div class="mb-3">
+                                <label for="editNombre" class="form-label">Nombre del Departamento</label>
+                                <input type="text" class="form-control" id="editNombre" name="nombre" value="<%= departamento.nombre %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSigla" class="form-label">Sigla</label>
+                                <input type="text" class="form-control" id="editSigla" name="sigla" value="<%= departamento.sigla %>" required>
+                            </div>
+                            <!-- Campo oculto para el ID del departamento -->
+                            <input type="hidden" name="id_departamento" value="<%= departamento.id_departamento %>">
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Actualizar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para eliminar departamento -->
+        <div class="modal fade" id="deleteModal<%= departamento.id_departamento %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Departamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el departamento <%= departamento.nombre %>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Formulario para eliminar -->
+                        <form action="/sp_admin/departamento/<%= departamento.id_departamento %>/eliminar" method="POST">
+                            <input type="hidden" name="id_departamento" value="<%= departamento.id_departamento %>">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+
+    <%- include('footer') %>
+</body>
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</html>

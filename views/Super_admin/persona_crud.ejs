@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persona</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+
+
+        <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-center"><br><br>
+                        <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                        <span class="mx-2">/</span>
+                        <a href="/sp_admin/persona" class="breadcrumb-link">Personas</a>
+                        <span class="mx-2">/</span>
+                        <span class="breadcrumb-current">Gestión de Personas</span>
+                    </div>
+
+                    <!-- Tarjeta flotante con tabla -->
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title">Lista de Personas</h5>
+                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#personModal">Agregar Persona</button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="personTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Apellido Paterno</th>
+                                            <th>Apellido Materno</th>
+                                            <th>Género</th>
+                                            <th>Dirección</th>
+                                            <th>Teléfono</th>
+                                            <th>Curp</th>
+                                            <th>Fecha Nacimiento</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% personas.forEach(persona=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= persona.nombre %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.apellido_paterno %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.apellido_materno %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.genero %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.direccion %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.telefono %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.curp %>
+                                                </td>
+                                                <td>
+                                                    <%= persona.fecha_nacimiento.toISOString().split('T')[0] %>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="dropdownMenu<%= persona.nombre.replace(/\s+/g, '') %>"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu"
+                                                            aria-labelledby="dropdownMenu<%= persona.nombre.replace(/\s+/g, '') %>">
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#editModal<%= persona.id_persona %>">
+                                                                    <i class="bi bi-pencil"></i> Editar
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal<%= persona.id_persona %>">
+                                                                    <i class="bi bi-trash"></i> Eliminar
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para agregar persona -->
+        <div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="personModalLabel">Agregar Persona</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addPersonForm" action="/sp_admin/persona/crear" method="POST"
+                            onsubmit="return validateForm()">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addName" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="addName" name="nombre" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addApellidoMaterno" class="form-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="addApellidoMaterno"
+                                            name="apellido_materno" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addDireccion" class="form-label">Dirección</label>
+                                        <input type="text" class="form-control" id="addDireccion" name="direccion"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addcurp" class="form-label">CURP</label>
+                                        <input type="text" class="form-control" id="addcurp" name="curp" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="addApellidoPaterno" class="form-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="addApellidoPaterno"
+                                            name="apellido_paterno" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addGenero" class="form-label">Género</label>
+                                        <select id="addGenero" name="genero" class="form-control" required>
+                                            <option value="">Seleccione</option>
+                                            <option value="M">Masculino</option>
+                                            <option value="F">Femenino</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addTelefono" class="form-label">Teléfono</label>
+                                        <input type="text" class="form-control" id="addTelefono" name="telefono"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addfecha" class="form-label">Fecha de Nacimiento</label>
+                                        <input type="date" class="form-control" id="addfecha" name="fecha_nacimiento"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function validateForm() {
+                // Obtener los elementos del formulario
+                const nombre = document.getElementById("addName").value.trim();
+                const apellidoMaterno = document.getElementById("addApellidoMaterno").value.trim();
+                const direccion = document.getElementById("addDireccion").value.trim();
+                const curp = document.getElementById("addcurp").value.trim();
+                const apellidoPaterno = document.getElementById("addApellidoPaterno").value.trim();
+                const genero = document.getElementById("addGenero").value.trim();
+                const telefono = document.getElementById("addTelefono").value.trim();
+                const fechaNacimiento = document.getElementById("addfecha").value.trim();
+
+                // Validar que todos los campos estén llenos
+                if (!nombre || !apellidoMaterno || !direccion || !curp || !apellidoPaterno || !genero || !telefono || !fechaNacimiento) {
+                    alert("Todos los datos deben estar llenados.");
+                    return false; // Evita que el formulario se envíe
+                }
+
+                // Validar que la fecha de nacimiento no sea hoy ni una fecha futura
+                const today = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+                if (fechaNacimiento >= today) {
+                    alert("La fecha de nacimiento debe ser anterior a hoy.");
+                    return false; // Evita que el formulario se envíe
+                }
+                return true; // Permite el envío del formulario si todo está completo y la fecha es válida
+            }
+
+            // Establecer la fecha máxima para la fecha de nacimiento como hoy
+            document.addEventListener("DOMContentLoaded", () => {
+                const fechaNacimientoInput = document.getElementById("addfecha");
+                fechaNacimientoInput.max = new Date().toISOString().split("T")[0]; // Fecha máxima es hoy
+            });
+        </script>
+
+
+
+  <!-- Modal Editar Persona y Usuario -->
+  <% personas.forEach(persona=> { %>
+    <div class="modal fade" id="editModal<%= persona.id_persona %>" tabindex="-1"
+        aria-labelledby="editModalLabel<%= persona.id_persona %>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel<%= persona.id_persona %>">Editar Persona y
+                        Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPersonUserForm<%= persona.id_persona %>" action="/sp_admin/persona/editar"
+                        method="POST">
+                        <!-- IDs ocultos de persona y usuario -->
+                        <input type="hidden" id="editIdPersona<%= persona.id_persona %>" name="id_persona"
+                            value="<%= persona.id_persona %>">
+
+                        <!-- Editar Datos de Persona -->
+                        <div class="mb-3">
+                            <label for="editNombre<%= persona.id_persona %>" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editNombre<%= persona.id_persona %>"
+                                name="nombre" value="<%= persona.nombre %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editApellidoPaterno<%= persona.id_persona %>"
+                                class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control"
+                                id="editApellidoPaterno<%= persona.id_persona %>" name="apellido_paterno"
+                                value="<%= persona.apellido_paterno %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editApellidoMaterno<%= persona.id_persona %>"
+                                class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control"
+                                id="editApellidoMaterno<%= persona.id_persona %>" name="apellido_materno"
+                                value="<%= persona.apellido_materno %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editGenero<%= persona.id_persona %>" class="form-label">Género</label>
+                            <select id="editGenero<%= persona.id_persona %>" name="genero" class="form-control"
+                                required>
+                                <option value="M" <%=persona.genero==='M' ? 'selected' : '' %>>Masculino
+                                </option>
+                                <option value="F" <%=persona.genero==='F' ? 'selected' : '' %>>Femenino</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDireccion<%= persona.id_persona %>"
+                                class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="editDireccion<%= persona.id_persona %>"
+                                name="direccion" value="<%= persona.direccion %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTelefono<%= persona.id_persona %>"
+                                class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="editTelefono<%= persona.id_persona %>"
+                                name="telefono" value="<%= persona.telefono %>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editcurp" class="form-label">Curp</label>
+                            <input type="text" class="form-control" id="editcurp<%= persona.id_persona %>"
+                                name="curp" value="<%= persona.curp %>">
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="editfecha" class="form-label">Fecha Nacimiento</label>
+                            <input type="date" class="form-control" id="editfecha<%= persona.id_persona %>"
+                                name="fecha_nacimiento"
+                                value="<%= persona.fecha_nacimiento ? new Date(persona.fecha_nacimiento).toISOString().split('T')[0] : '' %>">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+
+                <!-- Modal de confirmación de eliminación -->
+                <% personas.forEach(persona=> { %>
+                    <div class="modal fade" id="deleteModal<%= persona.id_persona %>" tabindex="-1"
+                        aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Persona</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar a <%= persona.nombre %>
+                                            <%= persona.apellido_paterno %>
+                                                <%= persona.apellido_materno %>? Esta acción no se puede deshacer.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                    <!-- Formulario para enviar el ID de la persona a eliminar -->
+                                    <form action="/sp_admin/persona/eliminar" method="POST" style="display:inline;">
+                                        <input type="hidden" name="id_persona" value="<%= persona.id_persona %>">
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+
+                        <%- include('footer') %>
+</body>
+
+</html>

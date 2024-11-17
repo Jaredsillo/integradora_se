@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="/assets/css/login/style_login.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Formulario de Login -->
+    <div class="form-container" id="loginForm">
+      <h2>Iniciar Sesión</h2>
+      <form id="login-form" action="/login" method="POST">
+        <input type="text" id="login-usuario" name="usuario" placeholder="Usuario" required>
+        <div class="password-container">
+          <input type="password" id="login-password" name="contrasena" placeholder="Contraseña" required>
+          <i class="fas fa-eye" id="toggleLoginPassword"></i>
+        </div>
+        <button type="submit">Login</button>
+        <p>¿No tienes cuenta? <a href="#" id="showRegister">Regístrate aquí</a></p>
+      </form>
+    </div>
+
+    <!-- Formulario de Registro -->  
+    <div class="form-container" id="registerForm" style="display:none;">
+      <h2>Registrarse</h2>
+      <form id="register-form" action="/register" method="POST">
+        <input type="text" id="register-nombre" name="nombre" placeholder="Nombre" required>
+        <input type="email" id="register-email" name="email" placeholder="Correo electrónico" required>
+        <div class="password-container">
+          <input type="password" id="register-password" name="password" placeholder="Contraseña" required>
+          <i class="fas fa-eye" id="toggleRegisterPassword"></i>
+        </div>
+        <button type="submit">Registrarse</button>
+        <p>¿Ya tienes cuenta? <a href="#" id="showLogin">Inicia sesión aquí</a></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="/assets/js/login/login.js"></script>
+</body>
+</html>

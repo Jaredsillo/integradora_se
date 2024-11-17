@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edificio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <%- include('navbar') %><br><br>
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/Edificio" class="breadcrumb-link">Edificios</a>
+                    <span class="mx-2">/</span>
+                    <span class="breadcrumb-current">Gestión de Edificios</span>
+                </div>
+
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Lista de Edificios</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#edificioModal">Agregar Edificio</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="personTable">
+                                <thead>
+                                    <tr>
+                                        <th>IdEdificio</th>
+                                        <th>Nombre</th>
+                                        <th>SIGLA</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% edificios.forEach((edificio) => { %>
+                                        <tr>
+                                            <td><%= edificio.id_edificio %></td>
+                                            <td><%= edificio.Nombre %></td>
+                                            <td><%= edificio.Sigla %></td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                        id="dropdownMenu<%= edificio.id_edificio %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= edificio.id_edificio %>">
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#viewModal<%= edificio.id_edificio %>">
+                                                                <i class="bi bi-eye"></i> Ver Detalles
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editModal<%= edificio.id_edificio %>">
+                                                                <i class="bi bi-pencil"></i> Editar
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#deleteModal<%= edificio.id_edificio %>">
+                                                                <i class="bi bi-trash"></i> Eliminar
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal Agregar Edificio -->
+<div class="modal fade" id="edificioModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Edificio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/sp_admin/Edificio/crear" method="POST">
+                    <div class="mb-3">
+                        <label for="nombreEdificio" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombreEdificio" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="siglaEdificio" class="form-label">SIGLA</label>
+                        <input type="text" class="form-control" id="siglaEdificio" name="sigla" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal Ver Detalles -->
+    <div class="modal fade" id="viewModal1" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewModalLabel">Detalles del Edificio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nombre:</strong> Edificio Principal</p>
+                    <p><strong>SIGLA:</strong> EDP</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% edificios.forEach(edificio => { %>
+        <!-- Modal Editar Edificio -->
+        <div class="modal fade" id="editModal<%= edificio.id_edificio %>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Edificio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/sp_admin/Edificio/editar" method="POST">
+                            <div class="mb-3">
+                                <label for="editNombreEdificio<%= edificio.id_edificio %>" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="editNombreEdificio<%= edificio.id_edificio %>" name="Nombre" value="<%= edificio.Nombre %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSiglaEdificio<%= edificio.id_edificio %>" class="form-label">SIGLA</label>
+                                <input type="text" class="form-control" id="editSiglaEdificio<%= edificio.id_edificio %>" name="Sigla" value="<%= edificio.Sigla %>" required>
+                            </div>
+                            <!-- Campo oculto para el ID del edificio -->
+                            <input type="hidden" name="id_edificio" value="<%= edificio.id_edificio %>">
+    
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Actualizar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+   <% }) %>
+   
+
+    <% edificios.forEach(edificio => { %>
+        <!-- Modal para eliminar edificio -->
+        <div class="modal fade" id="deleteModal<%= edificio.id_edificio %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Edificio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el edificio "<%= edificio.Nombre %>"?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Formulario para eliminar -->
+                        <form action="/sp_admin/Edificio/eliminar" method="POST">
+                            <input type="hidden" name="id_edificio" value="<%= edificio.id_edificio %>">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+
+    <%- include('footer') %>
+</body>
+</html>

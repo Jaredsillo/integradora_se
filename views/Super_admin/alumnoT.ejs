@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumno Tramite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+
+   
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/alumnoT" class="breadcrumb-link">Alumno Tramite</a>
+                    <span class="mx-2">/</span>
+                    <span class="breadcrumb-current">Gestión de Alumno Tramite</span>
+                </div>
+    
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Lista de Alumno Tramite</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#alumnotModal">Agregar Alumno Tramite</button>
+                        </div>
+    
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="personTable">
+                                <thead>
+                                    <tr>
+                                        <th>Matrícula</th>
+                                        <th>Alumno</th>
+                                        <th>Programa Académico</th>
+                                        <th>Trámite</th>
+                                        <th>Periodo</th>
+                                        <th>Fecha</th>
+                                        <th>Estatus</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% alumnoTramites.forEach((at) => { %>
+                                        <tr>
+                                            <td><%= at.MatriculaAlumno %></td>
+                                            <td><%= at.NombreAlumno %></td>
+                                            <td><%= at.ProgramaAcademico %></td>
+                                            <td><%= at.NombreTramite %></td>
+                                            <td><%= at.Periodo %></td>
+                                            <td><%= at.Fecha.toISOString().split('T')[0] %></td>
+                                            <td><%= at.Estatus %></td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                        id="dropdownMenu<%= at.IdAlumnoTramite %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= at.IdAlumnoTramite %>">
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editModal<%= at.IdAlumnoTramite %>">
+                                                                <i class="bi bi-pencil"></i> Editar
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal<%= at.IdAlumnoTramite %>">
+                                                                <i class="bi bi-trash"></i> Eliminar
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+ <!-- Modal para agregar alumno tramite -->
+<div class="modal fade" id="alumnotModal" tabindex="-1" aria-labelledby="alumnotModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alumnotModalLabel">Agregar Alumno Tramite</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAlumnotForm" action="/sp_admin/alumnoT/crear"  method="POST" >
+                    <div class="mb-3">
+                        <label for="IdTramite">Trámite:</label>
+                        <select name="IdTramite">
+                            <option value="" selected="true">Seleccionar un tramite</option>
+                            <% tramite.forEach(t => { %>
+                                <option value="<%= t.IdTramite %>"><%= t.Nombre %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addAlumno" class="form-label">Alumno</label>
+                        <select id="addAlumno" name="IdAlumno" class="form-select" required>
+                            <option value="" selected="true">Seleccionar un alumno</option>
+                            <% alumnos.forEach(alumno => { %>
+                                <option value="<%= alumno.id_alumno %>">
+                                    <%= alumno.nombre %> <%= alumno.apellido_paterno %> <%= alumno.apellido_materno %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="IdPeriodo">Periodo:</label>
+                        <select name="IdPeriodo">
+                            <option value="" selected="true">Seleccionar un periodo</option>
+                            <% periodos.forEach(periodo => { %>
+                                <option value="<%= periodo.id_periodo %>"><%= periodo.periodo %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Fecha" class="form-label">Fecha:</label>
+                        <input type="date" class="form-control" id="Fecha" name="Fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Estatus" class="form-label">Estado</label>
+                        <select id="Estatus" name="Estatus" class="form-select" required>
+                            <option value="" selected="true">Seleccionar el estado</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="Cancelado">Cancelado</option>
+                            <option value="Concluido">Concluido</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Editar Alumno Tramite --> 
+<% alumnoTramites.forEach((at) => { %>
+    <div class="modal fade" id="editModal<%= at.IdAlumnoTramite %>" tabindex="-1" aria-labelledby="editModalLabel<%= at.IdAlumnoTramite %>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel<%= at.IdAlumnoTramite %>">Editar Alumno Tramite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAlumnoTrForm<%= at.IdAlumnoTramite %>" action="/sp_admin/alumnoT/editar" method="POST">
+                        <!-- IDs oculto -->
+                        <input type="hidden" name="IdAlumnoTramite" value="<%= at.IdAlumnoTramite %>">
+
+                        <!-- Editar Datos del Alumno Tramite -->
+                        <div class="mb-3">
+                            <label for="IdTramite">Trámite:</label>
+                            <select name="IdTramite" class="form-select" required>
+                                <option value="<%= at.IdTramite %>" selected="true"><%= at.NombreTramite %></option>
+                                <% tramite.forEach(t => { %>
+                                    <option value="<%= t.IdTramite %>" <%= t.IdTramite === at.IdTramite ? 'selected' : '' %>>
+                                        <%= t.Nombre %>
+                                    </option>
+                                <% }) %>
+                            </select>                            
+                        </div>
+                        
+                        <!-- Alumno (Solo lectura) -->
+                        <div class="mb-3">
+                            <label for="IdAlumno" class="form-label">Alumno</label>
+                            <input type="text" class="form-control" value="<%= at.NombreAlumno %>" readonly>
+                        </div>                 
+
+                        <div class="mb-3">
+                            <label for="IdPeriodo">Periodo:</label>
+                            <select name="IdPeriodo" class="form-select" required>
+                                <option value="<%= at.IdPeriodo %>" selected="true"><%= at.Periodo %></option>
+                                <% periodos.forEach(periodo => { %>
+                                    <option value="<%= periodo.id_periodo %>" <%= periodo.id_periodo === at.IdPeriodo ? 'selected' : '' %>>
+                                        <%= periodo.periodo %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="Fecha" class="form-label">Fecha:</label>
+                            <input type="date" class="form-control" id="Fecha" name="Fecha" value="<%= at.Fecha.toISOString().split('T')[0] %>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editEstado" class="form-label">Estado</label>
+                            <select id="editEstado" name="Estatus" class="form-select" required>
+                                <option value="En proceso" <%= at.Estatus === 'En proceso' ? 'selected' : '' %>>En proceso</option>
+                                <option value="Cancelado" <%= at.Estatus === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
+                                <option value="Concluido" <%= at.Estatus === 'Concluido' ? 'selected' : '' %>>Concluido</option>
+                            </select>                            
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+
+
+<!-- Modal de confirmación de eliminación -->
+<% alumnoTramites.forEach((at) => { %>    
+    <div class="modal fade" id="deleteModal<%= at.IdAlumnoTramite %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Alumno Tramite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el trámite "<%= at.NombreTramite %>" de "<%= at.NombreAlumno %>"? Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <!-- Formulario para enviar el ID de la persona a eliminar -->
+                    <form action="/sp_admin/alumnoT/eliminar" method="POST" style="display:inline;">
+                        <input type="hidden" name="id_alumno_tramite" value="<%= at.IdAlumnoTramite %>">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+     <%- include('footer') %>
+</body>
+</html>

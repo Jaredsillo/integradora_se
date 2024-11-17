@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios </title>
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+        <!-- Navbar -->
+        <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-center"><br><br>
+                        <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                        <span class="mx-2">/</span>
+                        <a href="/sp_admin/Usuarios" class="breadcrumb-link">Usuarios</a>
+                        <span class="mx-2">/</span>
+                        <span class="breadcrumb-current">Consulta de Usuarios</span>
+                    </div>
+
+                    <!-- Tarjeta flotante con tabla -->
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title">Lista de Usuarios</h5>
+                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#personModal">Agregar Usuarios</button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="personTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Apellido Paterno</th>
+                                            <th>Apellido Materno</th>
+                                            <th>Usuario</th>
+                                            <th>Roles</th>
+                                            <th>Estatus</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% usuarios.forEach(usuario=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= usuario.nombre || 'N/A' %>
+                                                </td>
+                                                <td>
+                                                    <%= usuario.apellido_paterno || 'N/A' %>
+                                                </td>
+                                                <td>
+                                                    <%= usuario.apellido_materno || 'N/A' %>
+                                                </td>
+                                                <td>
+                                                    <%= usuario.usuario %>
+                                                </td>
+                                                <td>
+                                                    <% if (usuario.roles && usuario.roles.length> 0) {
+                                                        const rolesArray = usuario.roles.split(', ');
+                                                        rolesArray.forEach(role => { %>
+                                                        <span class="badge bg-secondary">
+                                                            <%= role %>
+                                                        </span>
+                                                        <% }); } else { %>
+                                                            <span class="badge bg-light text-dark">Sin Roles</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= usuario.estatus ? 'Activo' : 'Inactivo' %>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="dropdownMenu<%= usuario.id_user %>"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu"
+                                                            aria-labelledby="dropdownMenu<%= usuario.id_user %>">
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#addRoleModal<%= usuario.id_user %>">
+                                                                    <i class="bi bi-eye"></i> Agregar Rol
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteRoleModal<%= usuario.id_user %>">
+                                                                    <i class="bi bi-trash"></i> Eliminar Rol
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#editModal<%= usuario.id_user %>">
+                                                                    <i class="bi bi-pencil"></i> Editar
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button class="dropdown-item" data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal<%= usuario.id_user %>">
+                                                                    <i class="bi bi-trash"></i> Eliminar
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para agregar usuario -->
+        <div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="personModalLabel">Agregar Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addUserForm" action="/sp_admin/Usuarios/crear" method="POST">
+                                              <div class="mb-3">
+                                <label for="personSelect" class="form-label">Seleccionar Persona</label>
+                                <select id="personSelect" class="selectpicker" name="id_persona" data-show-subtext="true" data-live-search="true">
+                                    <option value="" selected="true">Seleccionar persona</option>
+                                    <% personasSinUsuarios.forEach(person => { %>
+                                        <option value="<%= person.id_persona %>">
+                                            <%= person.nombre %> <%= person.apellido_paterno %> <%= person.apellido_materno %> - <%= person.curp %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="usuario" class="form-label">Usuario</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="contrasena" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="roles" class="form-label">Seleccionar Rol</label>
+                                <select id="roles" class="form-select" name="id_rol" required>
+                                    <option value="" selected="true">Seleccionar rol</option>
+                                    <% rolesConUsuarios.forEach(rol=> { %>
+                                        <% if (rol.id_rol !==4) { %> <!-- Suponiendo que 4 es el ID del superadmin -->
+                                            <option value="<%= rol.id_rol %>">
+                                                <%= rol.nombre_rol %>
+                                            </option>
+                                            <% } %>
+                                                <% }); %>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="estatus" class="form-label">Estatus</label>
+                                <select id="estatus" class="form-select" name="estatus" required>
+                                    <option value="1">Activo</option>
+                                    <option value="0">Inactivo</option>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Agregar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% usuarios.forEach(usuario=> { %>
+            <!-- Modal para editar usuario -->
+            <div class="modal fade" id="editModal<%= usuario.id_user %>" tabindex="-1" aria-labelledby="editModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel">Editar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editUserForm<%= usuario.id_user %>" method="POST"
+                                action="/sp_admin/Usuarios/editar">
+
+                                <!-- Selección de Persona (editable) -->
+                                <div class="mb-3">
+                                    <label for="editPersonSelect" class="form-label">Actualizar Persona
+                                        (opcional)</label>
+                                    <select id="editPersonSelect" class="selectpicker" name="id_persona"
+                                        data-show-subtext="true" data-live-search="true">
+                                        <option value="" selected="true">Seleccionar persona</option>
+                                        <% personasSinUsuarios.forEach(person=> { %>
+                                            <option value="<%= person.id_persona %>"
+                                                <%=usuario.id_persona===person.id_persona ? 'selected' : '' %> >
+                                                <%= person.nombre %>
+                                                    <%= person.apellido_paterno %>
+                                                        <%= person.apellido_materno %>
+                                            </option>
+                                            <% }); %>
+                                    </select>
+                                </div>
+
+                                <!-- Visualización de datos de la persona -->
+                                <div class="mb-3">
+                                    <label class="form-label">Datos de la persona asociada al usuario</label>
+                                    <% if (!usuario.id_persona) { %>
+                                        <div class="alert alert-warning" role="alert">
+                                            No hay persona asociada a este usuario.
+                                        </div>
+                                        <% } %>
+                                </div>
+
+                                <!-- Visualización de datos de la persona -->
+                                <div class="mb-3">
+                                    <label for="viewNombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="viewNombre"
+                                        value="<%= usuario.nombre  || '' %>" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="viewApellidoPaterno" class="form-label">Apellido Paterno</label>
+                                    <input type="text" class="form-control" id="viewApellidoPaterno"
+                                        value="<%= usuario.apellido_paterno || '' %>" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="viewApellidoMaterno" class="form-label">Apellido Materno</label>
+                                    <input type="text" class="form-control" id="viewApellidoMaterno"
+                                        value="<%= usuario.apellido_materno || '' %>" disabled>
+                                </div>
+
+                                <!-- Campo de Usuario (editable) -->
+                                <div class="mb-3">
+                                    <label for="editUsuario" class="form-label">Usuario</label>
+                                    <input type="text" class="form-control" id="editUsuario" name="usuario"
+                                        value="<%= usuario.usuario %>" required>
+                                </div>
+
+                                <!-- Estatus (editable) -->
+                                <div class="mb-3">
+                                    <label for="editEstatus" class="form-label">Estatus</label>
+                                    <select id="editEstatus" class="form-select" name="estatus" required>
+                                        <option value="1" <%=usuario.estatus===1 ? 'selected' : '' %>>Activo</option>
+                                        <option value="0" <%=usuario.estatus===0 ? 'selected' : '' %>>Inactivo</option>
+                                    </select>
+                                </div>
+
+                                <!-- Campo oculto para el ID del usuario -->
+                                <input type="hidden" name="id_usuario" value="<%= usuario.id_user %>">
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary"
+                                form="editUserForm<%= usuario.id_user %>">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+
+
+
+                <% usuarios.forEach(usuario=> { %>
+                    <div class="modal fade" id="deleteModal<%= usuario.id_user %>" tabindex="-1"
+                        aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Usuario</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        ¿Estás seguro de que deseas eliminar a <%= usuario.usuario %>
+                                            (<%= usuario.nombre || 'Sin Nombre' %>
+                                                <%= usuario.apellido_paterno || '' %>
+                                                    <%= usuario.apellido_materno || '' %>)?
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                    <form action="/sp_admin/usuarios/eliminar" method="POST">
+                                        <input type="hidden" name="id_user" value="<%= usuario.id_user %>">
+                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+
+                        <!-- Modal para agregar rol -->
+                        <% usuarios.forEach(usuario=> { %> <!-- Iteramos sobre la lista de usuarios -->
+                            <div class="modal fade" id="addRoleModal<%= usuario.id_user %>" tabindex="-1"
+                                aria-labelledby="addRoleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addRoleModalLabel">Agregar Rol a Usuario <%=
+                                                    usuario.usuario %>
+                                            </h5> <!-- Muestra el nombre del usuario -->
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="addRoleForm<%= usuario.id_user %>" method="POST"
+                                                action="/sp_admin/Usuarios/agregarRol">
+                                                <div class="mb-3">
+                                                    <label for="roles" class="form-label">Seleccionar Rol</label>
+                                                    <select id="roles" class="form-select" name="id_rol" required>
+                                                        <option value="" selected="true">Seleccionar rol</option>
+                                                        <% rolesConUsuarios.forEach(rol=> { %>
+                                                            <% if (rol.id_rol !==4) { %>
+                                                                <!-- Suponiendo que 4 es el ID del superadmin -->
+                                                                <option value="<%= rol.id_rol %>">
+                                                                    <%= rol.nombre_rol %>
+                                                                </option>
+                                                                <% } %>
+                                                                    <% }); %>
+                                                    </select>
+                                                </div>
+                                                <!-- Campo oculto para el ID del usuario -->
+                                                <input type="hidden" name="id_usuario" value="<%= usuario.id_user %>">
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="submit" class="btn btn-primary"
+                                                form="addRoleForm<%= usuario.id_user %>">Agregar Rol</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %> <!-- Cerramos el foreach de usuarios -->
+
+
+                                <% usuarios.forEach(usuario=> { %>
+                                    <!-- Modal para eliminar rol -->
+                                    <div class="modal fade" id="deleteRoleModal<%= usuario.id_user %>" tabindex="-1"
+                                        aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteRoleModalLabel">Eliminar Rol de
+                                                        Usuario <%= usuario.usuario %>
+                                                    </h5> <!-- Muestra el nombre del usuario -->
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="deleteRoleForm<%= usuario.id_user %>" method="POST"
+                                                        action="/sp_admin/Usuarios/eliminarRol">
+                                                        <% if (usuario.roles && usuario.roles.length> 0) { %>
+                                                            <p>¿Estás seguro de que deseas eliminar un rol de <strong>
+                                                                    <%= usuario.usuario %>
+                                                                </strong>?</p>
+
+                                                            <label for="rolEliminar" class="form-label">Seleccionar Rol
+                                                                a Eliminar</label>
+                                                            <select id="rolEliminar" class="form-select" name="id_rol"
+                                                                required>
+                                                                <option value="" selected="true">Seleccionar rol
+                                                                </option>
+                                                                <% const rolesArray=usuario.roles.split(', ');
+                                    const rolesIdsArray = usuario.rolesIds.split(' , '); // Asegúrate de que esto contenga los IDs
+                                    rolesArray.forEach((role, index) => { %>
+                                        <option value="<%= rolesIdsArray[index] %>"> <!-- Usa el id del rol aquí -->
+                                            <%= role %> <!-- Nombre del rol -->
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            <% } else { %>
+                                <p><strong><%= usuario.usuario %></strong> no tiene roles asignados.</p>
+                            <% } %>
+                            <!-- Campo oculto para el ID del usuario -->
+                            <input type="hidden" name="id_usuario" value="<%= usuario.id_user %>">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <% if (usuario.roles && usuario.roles.length > 0) { %>
+                            <button type="submit" class="btn btn-danger" form="deleteRoleForm<%= usuario.id_user %>">Eliminar Rol</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+
+    <%- include('footer') %>
+
+
+    <script src="/js/super_admin/alumno.js"></script>
+</body> 
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TramiteProceso CRUD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.3/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <%- include('navbar') %>
+
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/tramite_proceso" class="breadcrumb-link">Proceso del tramite</a>
+                </div>
+
+        <!-- Tarjeta flotante con tabla -->
+        <div class="card shadow mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title">Lista de Trámites en Proceso</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#personModal">Agregar Trámite</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="personTable">
+                        <thead>
+                            <tr>
+                                <th>ID Proceso</th>
+                                <th>Trámite</th>
+                                <th>Actividad</th>
+                                <th>Objeto</th>
+                                <th>Orden</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% tramiteProceso.forEach(proceso => { %>
+                                <tr>
+                                    <td><%= proceso.idTramiteProceso %></td>
+                                    <td><%= proceso.NombreTramite %> (ID: <%= proceso.IdTramite %>)</td>
+                                    <td><%= proceso.NombreActividad %> (ID: <%= proceso.IdActividad %>)</td>
+                                    <td><%= proceso.Objeto %></td>
+                                    <td><%= proceso.Orden %></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu<%= proceso.idTramiteProceso %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= proceso.idTramiteProceso %>">
+                                                <li>
+                                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editModal<%= proceso.idTramiteProceso %>"
+                                                        data-id="<%= proceso.idTramiteProceso %>" id="editBtn_<%= proceso.idTramiteProceso %>">
+                                                        <i class="bi bi-pencil"></i> Editar
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal<%= proceso.idTramiteProceso %>"
+                                                        data-id="<%= proceso.idTramiteProceso %>" id="deleteBtn_<%= proceso.idTramiteProceso %>">
+                                                        <i class="bi bi-trash"></i> Eliminar
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal para agregar TramiteProceso -->
+<div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="tramiteProcesoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tramiteProcesoModalLabel">Agregar Proceso de Trámite</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTramiteProcesoForm" action="/sp_admin/tramite_proceso/crear" method="POST">
+                    <div class="mb-3">
+                        <label for="addTramite" class="form-label">Trámite</label>
+                        <select id="addTramite" name="id_tramite" class="form-control" required>
+                            <% tramite.forEach(tramite => { %>
+                                <option value="<%= tramite.IdTramite %>"><%= tramite.Nombre %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addActividad" class="form-label">Actividad</label>
+                        <select id="addActividad" name="id_actividad" class="form-control" required>
+                            <% actividad.forEach(actividad => { %>
+                                <option value="<%= actividad.IdActividad %>"><%= actividad.Nombre %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addObjeto" class="form-label">Objeto</label>
+                        <textarea class="form-control" id="addObjeto" name="objeto" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addOrden" class="form-label">Orden</label>
+                        <input type="number" class="form-control" id="addOrden" name="orden" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% tramiteProceso.forEach(proceso => { %>
+<!-- Modal para editar TramiteProceso -->
+<div class="modal fade" id="editModal<%= proceso.idTramiteProceso %>" tabindex="-1" aria-labelledby="editTramiteProcesoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTramiteProcesoModalLabel">Editar Proceso de Trámite</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTramiteProcesoForm" action="/sp_admin/tramite_proceso/editar" method="POST">
+                    <!-- Asumiendo que el ID del TramiteProceso se pasa como un campo oculto -->
+                    <input type="hidden" id="editId" name="id" value="<%= proceso.idTramiteProceso %>">
+
+                    <div class="mb-3">
+                        <label for="editTramite" class="form-label">Trámite</label>
+                        <select id="editTramite" name="id_tramite" class="selectpicker form-control" required data-show-subtext="true" data-live-search="true">
+                            <!-- Mostrar el nombre del trámite actual -->
+                            <% tramite.forEach(tramite => { %>
+                                <option value="<%= tramite.IdTramite %>" 
+                                    <%= tramite.IdTramite === proceso.Idtramite ? 'selected' : '' %> >
+                                    <%= tramite.Nombre %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    
+
+                    <div class="mb-3">
+                        <label for="editActividad" class="form-label">Actividad</label>
+                        <select id="editActividad" name="id_actividad" class="selectpicker form-control" required data-show-subtext="true" data-live-search="true">
+                            <% actividad.forEach(actividad => { %>
+                                <option value="<%= actividad.IdActividad %>"
+                                    <%= actividad.IdActividad === proceso.IdActividad ? 'selected' : '' %>>
+                                    <%= actividad.Nombre %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editObjeto" class="form-label">Objeto</label>
+                        <textarea class="form-control" id="editObjeto" name="objeto" rows="3" required><%= proceso.Objeto %></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editOrden" class="form-label">Orden</label>
+                        <input type="number" class="form-control" id="editOrden" name="orden" value="<%= proceso.Orden %>" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<% }); %>
+
+<!-- Modal de confirmación de eliminación -->
+<% tramiteProceso.forEach(proceso => { %>
+    <div class="modal fade" id="deleteModal<%= proceso.idTramiteProceso %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Proceso de Trámite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el Proceso de Trámite <%= proceso.Objeto %>? Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="/sp_admin/tramite_proceso/eliminar" method="POST" style="display:inline;">
+                        <input type="hidden" name="idTramiteProceso" value="<%= proceso.idTramiteProceso %>">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+
+
+    <%- include('footer') %>
+
+</body>
+
+</html>

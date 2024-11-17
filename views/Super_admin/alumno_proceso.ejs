@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumno Proceso CRUD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <%- include('navbar') %>
+
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-inner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/alumno_proceso" class="breadcrumb-link">Alumno en Proceso</a>
+                </div>
+
+        <!-- Tarjeta flotante con tabla -->
+        <div class="card shadow mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title">Lista de Alumnos en Proceso</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#personModal">Agregar Alumno</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="personTable">
+                        <thead>
+                            <tr>
+                                <th>ID Alumno Proceso</th>
+                                <th>Alumno Trámite</th>
+                                <th>Tramite proceso</th>
+                                <th>Actividad</th>
+                                <th>Orden</th>
+                                <th>Estatus</th>
+                                <th>Observacion</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% alumnoproceso.forEach(proceso => { %>
+                                <tr>
+                                    <td><%= proceso.IdAlumnoProceso %></td>
+                                    <td><%= proceso.NombreAlumno %> (ID: <%= proceso.IdAlumnoTramite %>) %></td>
+                                    <td><%= proceso.IdTramiteProceso %></td>
+                                    <td><%= proceso.NombreActividad %> (ID: <%= proceso.IdActividad %>)</td>
+                                    <td><%= proceso.Orden %></td> 
+                                    <td><%= proceso.Estatus %></td>
+                                    <td><%= proceso.Observacion || 'No disponible' %></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu<%= proceso.IdAlumnoProceso %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= proceso.IdAlumnoProceso %>">
+                                                <li>
+                                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editModal<%= proceso.IdAlumnoProceso %>"
+                                                        data-id="<%= proceso.IdAlumnoProceso %>" id="editBtn_<%= proceso.IdAlumnoProceso %>">
+                                                        <i class="bi bi-pencil"></i> Editar
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal<%= proceso.IdAlumnoProceso %>"
+                                                        data-id="<%= proceso.IdAlumnoProceso %>" id="deleteBtn_<%= proceso.IdAlumnoProceso %>">
+                                                        <i class="bi bi-trash"></i> Eliminar
+                                                    </button>
+                                                </li>
+                                            </ul>
+
+ 
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal para agregar AlumnoProceso -->
+<div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="tramiteProcesoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tramiteProcesoModalLabel">Agregar Alumno Proceso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAlumnoTramiteProcesoForm" action="/sp_admin/alumno_proceso/crear" method="POST">
+
+                    <div class="mb-3">
+                        <label for="addAlumnoTramite" class="form-label">Alumno Tramite</label>
+
+                        <select id="addAlumnoTramite" name="IdAlumnoTramite" class="form-control" required>
+                            <% alumnoproceso.forEach(alumnotramite => { %>
+                                <option value="<%= alumnotramite.IdAlumnoTramite %>"><%= alumnotramite.IdAlumnoTramite %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="addTramiteProceso" class="form-label">Tramite Proceso</label>
+
+                        <select id="addTramiteProceso" name="IdTramiteProceso" class="form-control" required>
+                            <% alumnoproceso.forEach(tramiteproceso => { %>
+                                <option value="<%= tramiteproceso.IdTramiteProceso %>"><%= tramiteproceso.IdTramiteProceso %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="addActividad" class="form-label">Actividad</label>
+                        <select id="addActividad" name="IdActividad" class="form-control" required>
+                            <% alumnoproceso.forEach(actividad => { %>
+                                <option value="<%= actividad.IdActividad %>"><%= actividad.NombreActividad %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="addOrden" class="form-label">Orden</label>
+                        <input type="number" class="form-control" id="addOrden" name="Orden" required>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="addEstatus" class="form-label">Estatus</label>
+                        <select class="form-control" id="addEstatus" name="Estatus" required>
+                            <option value="En proceso">En proceso</option>
+                            <option value="Concluido">Concluido</option>
+                        </select>
+                    </div>
+                    
+                    
+                    <div class="mb-3">
+                        <label for="addObservacion" class="form-label">Observacion</label>
+                        <textarea class="form-control" id="addObservacion" name="Observacion" ></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para Editar AlumnoProceso -->
+<% alumnoproceso.forEach(proceso => { %>
+    <div class="modal fade" id="editModal<%= proceso.IdAlumnoProceso %>" tabindex="-1" aria-labelledby="editTramiteProcesoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTramiteProcesoModalLabel">Editar Proceso de Trámite</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="editTramiteProcesoForm" action="/sp_admin/alumno_proceso/editar" method="POST">
+                        <!-- Asumiendo que el ID del TramiteProceso se pasa como un campo oculto -->
+                        <input type="hidden" id="editIdProceso<%= proceso.IdAlumnoProceso %>" name="IdAlumnoProceso" value="<%= proceso.IdAlumnoProceso %>">
+                      
+                        <label for="programaSelect-<%= proceso.IdAlumnoProceso %>" class="form-label">Seleccionar Alumno Proceso</label>
+                        <div class="mb-3">
+                            <select id="programaSelect-<%= proceso.IdAlumnoTramite %>" class="selectpicker" name="IdAlumnoTramite" required data-show-subtext="true" data-live-search="true">
+                                <!-- Mostrar el nombre del programa académico actual -->
+                                <option value="<%= proceso.IdAlumnoTramite %>" selected="true">
+                                    <%= proceso.NombreAlumno %>
+                                </option>
+                                <!-- Listar los programas académicos sin relaciones -->
+                                <% alumnoTramites.forEach(alumnotramite => { %>
+                                    <!-- Evitar duplicar el programa académico actual en la lista -->
+                                    <% if (alumnotramite.IdAlumnoTramite !== proceso.IdAlumnoTramite) { %>
+                                        <option value="<%= alumnotramite.IdAlumnoTramite %>">
+                                            <%= alumnotramite.NombreAlumno %>
+                                        </option>
+                                    <% } %>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <label for="programaSelect-<%= proceso.IdTramiteProceso %>" class="form-label">Seleccionar Tramite Proceso</label>
+                        <div class="mb-3">
+                            <select id="addAlumnoTramite<%= proceso.IdTramiteProceso %>" class="selectpicker" name="IdTramiteProceso" required data-show-subtext="true" data-live-search="true">
+                                <!-- Mostrar el nombre del TramiteProceso -->
+                              
+                                <!-- Listar los TramiteProceso -->
+                                <% tramiteProceso.forEach(procesotramite => { %>
+                                    <!-- Evitar duplicar el programa académico actual en la lista -->
+                                    <% if (procesotramite.idTramiteProceso !== proceso.idTramiteProceso) { %>
+                                        <option value="<%= procesotramite.idTramiteProceso %>">
+                                            <%= procesotramite.idTramiteProceso %>
+                                        </option>
+                                    <% } %>
+                                <% }); %>
+                            </select>
+                        </div>
+<label for="actividadSelect-<%= proceso.IdActividad %>" class="form-label">Seleccionar Actividad</label>
+<div class="mb-3">
+    <select id="actividadSelect-<%= proceso.IdActividad %>" class="selectpicker" name="IdActividad" required data-show-subtext="true" data-live-search="true">
+        <option value="<%= proceso.IdActividad %>" selected>
+            <%= proceso.NombreActividad %> (Actual)
+        </option>
+        <% actividad.forEach(activi => { %>
+            <% if (activi.IdActividad !== proceso.IdActividad) { %>
+                <option value="<%= activi.IdActividad %>">
+                    <%= activi.Nombre %>
+                </option>
+            <% } %>
+        <% }); %>
+    </select>
+</div>
+                        <div class="mb-3">
+                            <label for="editOrden" class="form-label">Orden</label> 
+                            <textarea class="form-control" id="editOrden" name="Orden" required><%= proceso.Orden %></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editEstatus" class="form-label">Estatus</label>
+                            <select id="editEstatus" name="Estatus" class="form-control" required>
+                                <option value="En proceso" <%= proceso.Estatus === 'En proceso' ? 'selected' : '' %>>En Proceso</option>
+                                <option value="Concluido" <%= proceso.Estatus === 'Concluido' ? 'selected' : '' %>>Concluido</option>
+                            </select>
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="editObservacion" class="form-label">Observacion</label>
+                            <textarea class="form-control" id="editObservacion" name="Observacion"><%= proceso.Observacion %></textarea>
+                        </div>
+    
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+<!-- Modal de confirmación de eliminación -->
+<% alumnoproceso.forEach(proceso => { %>
+    <div class="modal fade" id="deleteModal<%= proceso.IdAlumnoProceso %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Alumno Proceso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar alumno proceso <%= proceso.IdAlumnoProceso %>? Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="/sp_admin/alumno_proceso/eliminar" method="POST" style="display:inline;">
+                        <input type="hidden" name="IdAlumnoProceso" value="<%= proceso.IdAlumnoProceso %>">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<% }); %>
+
+
+
+    <%- include('footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

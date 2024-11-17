@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actividad CRUD</title>
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <%- include('navbar') %><br><br>
+    
+    <!-- Navbar -->
+    <div class="container mt-5" style="text-align: center; margin-top: 180px;">
+        <div class="container">
+            <div class="page-iner">
+                <div class="d-flex align-items-center"><br><br>
+                    <a href="/sp_admin/vista_principal" class="breadcrumb-link">Vista Principal</a>
+                    <span class="mx-2">/</span>
+                    <a href="/sp_admin/actividad" class="breadcrumb-link">Actividades</a>
+                    <span class="mx-2">/</span>
+                    <span class="breadcrumb-current">Consulta de Actividades</span>
+                </div>
+                <!-- Tarjeta flotante con tabla -->
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title">Lista de Actividades</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">Agregar Actividad</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="personTable">
+                                <thead>
+                                    <tr>
+                                        <th>No. Actividad</th>
+                                        <th>Nombre</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% actividades.forEach(actividad => { %>
+                                        <tr>
+                                            <td><%= actividad.IdActividad %></td>
+                                            <td><%= actividad.Nombre %></td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                        id="dropdownMenu<%= actividad.IdActividad %>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu<%= actividad.IdActividad %>">
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editModal<%= actividad.IdActividad %>">
+                                                                <i class="bi bi-pencil"></i> Editar
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal<%= actividad.IdActividad %>">
+                                                                <i class="bi bi-trash"></i> Eliminar
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                     <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar una nueva actividad -->
+    <div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addActivityModalLabel">Agregar Nueva Actividad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/sp_admin/actividad/crear" method="POST">
+                        <div class="mb-3">
+                            <label for="activityName" class="form-label">Nombre de la Actividad</label>
+                            <input type="text" class="form-control" id="activityName" name="Nombre" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Actividad --> 
+    <% actividades.forEach(actividad => { %>
+        <div class="modal fade" id="editModal<%= actividad.IdActividad %>" tabindex="-1" aria-labelledby="editModalLabel<%= actividad.IdActividad %>" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel<%= actividad.IdActividad %>">Editar Actividad</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/sp_admin/actividad/editar" method="POST">
+                            <input type="hidden" name="IdActividad" value="<%= actividad.IdActividad %>">
+                            <div class="mb-3">
+                                <label for="editName<%= actividad.IdActividad %>" class="form-label">Nombre de la Actividad</label>
+                                <input type="text" class="form-control" id="editName<%= actividad.IdActividad %>" name="Nombre" value="<%= actividad.Nombre %>" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Actualizar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+
+    <!-- Modal Eliminar Actividad --> 
+    <% actividades.forEach(actividad => { %>
+        <div class="modal fade" id="deleteModal<%= actividad.IdActividad %>" tabindex="-1" aria-labelledby="deleteModalLabel<%= actividad.IdActividad %>" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel<%= actividad.IdActividad %>">Eliminar Actividad</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar la actividad <strong>"<%= actividad.Nombre %>"</strong>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="/sp_admin/actividad/eliminar" method="POST">
+                            <input type="hidden" name="IdActividad" value="<%= actividad.IdActividad %>">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+
+    <%- include('footer') %>
+</body>
+</html>
